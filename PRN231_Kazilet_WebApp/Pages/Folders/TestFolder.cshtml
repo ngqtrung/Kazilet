@@ -1,0 +1,190 @@
+﻿@page
+@model PRN231_Kazilet_WebApp.Pages.Folders.TestFolderModel
+@{
+}
+
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dialog Example</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f6f7fb;
+        }
+
+        #openDialog {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #4255ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            width: 500px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e6e6e6;
+        }
+
+        .dialog-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1d28;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #586380;
+            cursor: pointer;
+            padding: 4px;
+            position: absolute;
+            right: 16px;
+            top: 16px;
+        }
+
+        .dialog-content {
+            padding: 24px;
+            min-height: 180px; /* Added fixed minimum height */
+            position: relative; /* For absolute positioning of button */
+        }
+
+        .input-label {
+            display: block;
+            font-size: 14px;
+            color: #4255ff;
+            margin-bottom: 8px;
+        }
+
+        #userInput {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #e6e6e6;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+            #userInput:focus {
+                outline: none;
+                border-color: #4255ff;
+            }
+
+        #confirmBtn {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #8854c0;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            #confirmBtn:hover {
+                background-color: #60255b;
+            }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <button id="openDialog">Open Dialog</button>
+
+    <div id="overlay" class="overlay"></div>
+    <div id="dialogBox" class="dialog">
+        <div class="dialog-header">
+            <span class="dialog-title">Create a new folder</span>
+            <button class="close-btn" onclick="closeDialog()">&times;</button>
+        </div>
+        <div class="dialog-content">
+            <label class="input-label" for="folderTitle">Title</label>
+            <input type="text" id="folderTitle" placeholder="">
+            <button id="confirmBtn" onclick="submitForm()">Create folder</button>
+        </div>
+    </div>
+
+    <script>
+        const dialog = document.getElementById('dialogBox');
+        const overlay = document.getElementById('overlay');
+        const openBtn = document.getElementById('openDialog');
+        const folderTitle = document.getElementById('folderTitle');
+
+        openBtn.addEventListener('click', () => {
+            dialog.style.display = 'block';
+            overlay.style.display = 'block';
+            folderTitle.focus();
+        });
+
+        function closeDialog() {
+            dialog.style.display = 'none';
+            overlay.style.display = 'none';
+            folderTitle.value = '';
+        }
+
+
+
+        function submitForm() {
+            const folderTitleValue = document.getElementById('folderTitle').value;
+            const folderData = {
+                folderName: folderTitleValue
+            }
+
+            // Gửi dữ liệu đến API
+            fetch('http://localhost:7024/api/Folders/Add?folderName=' + folderTitleValue, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(folderData),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Folder created successfully!');
+                    } else {
+                        alert('Failed to create folder!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while creating the folder.');
+                });
+        }
+
+        // Close dialog when clicking outside
+        overlay.addEventListener('click', closeDialog);
+    </script>
+</body>
+</html>

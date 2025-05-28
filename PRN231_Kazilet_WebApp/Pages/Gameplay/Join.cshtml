@@ -1,0 +1,711 @@
+﻿@page
+@model PRN231_Kazilet_WebApp.Pages.Gameplay.JoinModel
+@{
+}
+<!-- Change Password Dialog -->
+<div id="changePasswordDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
+        <h3 class="text-2xl font-bold text-white mb-4">Change password</h3>
+        <form class="mt-3" id="changePasswordForm">
+            <div class="mb-4">
+                <label for="oldPwd" class="block text-sm font-medium text-gray-300 mb-2">Old Password</label>
+                <input type="password" id="oldPwd" name="oldPwd" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                <label for="newPwd" class="block text-sm font-medium text-gray-300 mb-2">New Password</label>
+                <input type="password" id="newPwd" name="newPwd" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                <label for="cfPwd" class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+                <input type="password" id="cfPwd" name="cfPwd" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+            </div>
+            <div id="changeErrorMessage" class="mb-4 text-red-500 text-sm hidden"></div>
+            <button type="button" id="changePasswordBtn" disabled
+                    class="w-full bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary-dark transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                Change Password
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Search Header -->
+<header class="border-b border-gray-200 sticky top-0 bg-white z-10 w-full">
+    <div class="container mx-auto px-4 py-4 flex items-center">
+        <button id="mobileMenuToggle" class="mr-2 md:hidden text-primary hover:text-secondary focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+        <div class="flex-shrink-0 mr-2">
+            <a href="/" class="text-primary text-2xl font-bold">Kazilet</a>
+        </div>
+        <div class="relative flex-1">
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="searchInput" placeholder="Search course..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent">
+        </div>
+        <div class="flex items-center ml-2">
+            <button onclick="window.location.href='/gameplay/join'" class="text-gray-700 bg-gray-100 hover:text-gray-900 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium">
+                Join game
+            </button>
+            <button onclick="window.location.href='/authen/login'" class="login-btn text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                Login
+            </button>
+            <button onclick="window.location.href='/authen/register'" class="register-btn bg-secondary hover:bg-primary text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                Register
+            </button>
+            @* <span class="username text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-semibold" style="display: none;"></span> *@
+            <div class="relative username" id="username" style="display: none;">
+                <button id="usernameShow" class="text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-semibold"></button>
+                <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="showChangePasswordDialog()">Change Password</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="logout()">Logout</a>
+                </div>
+            </div>
+            @* <button onclick="logout()" class="logout-btn bg-secondary hover:bg-primary text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out" style="display: none;">
+            Logout
+            </button> *@
+        </div>
+    </div>
+</header>
+
+<div style="background-color:#471b43" class="container h-full flex items-center justify-center mx-auto px-4 py-8">
+    <div class="max-w-3xl  rounded-lg overflow-hidden shadow-2xl">
+        <div class="text-center flex flex-col items-center justify-center" style="padding: 100px">
+            <h1 class="text-4xl font-bold text-white mb-4">GAME PIN</h1>
+            <form id="formFind" onsubmit="find(event)" class="text-center flex flex-col w-fit justify-center p-8 rounded-lg items-center bg-white">
+                <input type="text" id="code" class="text-black mb-4 py-5 px-10 border text-xl border-gray-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 text-center h-16 w-full" placeholder="Enter Game PIN" required />
+                <button style="background: #8854c0" type="submit" class="focus:outline-none text-xl text-white bg-black focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm h-16 w-full">Find</button>
+            </form>
+
+            <form id="formJoin" style="display:none" onsubmit="join(event)" class="text-center flex flex-col w-fit justify-center p-8 rounded-lg items-center bg-white">
+                <input type="text" id="usernameInputText" class="text-black mb-4 py-5 px-10 border text-xl border-gray-500 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 text-center h-16 w-full" placeholder="Enter Username" required />
+                <button style="background: #8854c0" type="submit" class="focus:outline-none text-xl text-white bg-black focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm h-16 w-full">Join</button>
+            </form>
+        </div>
+    </div>
+</div>
+<div id="toast-success-create" class="flex hidden animate-[fade-out_2s_ease-out_5s_1_forwards] opacity-1 flex-col fixed z-50 top-5 right-5 items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+    <div class="flex flex-row items-center justify-between w-full">
+        <div class="flex flex-row items-center">
+            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+                </svg>
+                <span class="sr-only">Check icon</span>
+            </div>
+            <div class="ms-3 text-sm font-normal">Find game successfully</div>
+        </div>
+        <div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-success" aria-label="Close">
+                <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="flex flex-row items-center justify-between w-full">
+        <div class="w-full bg-gray-200 rounded-full h-1.5 mb-1 mt-2 dark:bg-gray-700">
+            <div id="animateDiv-create" class="bg-green-400 h-1.5 rounded-full dark:bg-green-300 animate-[reduce_7s_ease-in-out_0s_1_forwards]" style="width: 100%"></div>
+        </div>
+    </div>
+</div>
+
+<div id="toast-danger-create" class="flex hidden animate-[fade-out_2s_ease-out_5s_1_forwards] opacity-1 flex-col fixed z-50 top-5 right-5 items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+    <div class="flex flex-row items-center justify-between w-full">
+        <div class="flex flex-row items-center">
+            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z" />
+                </svg>
+                <span class="sr-only">Error icon</span>
+            </div>
+            <div class="ms-3 text-sm font-normal">Room not existed</div>
+        </div>
+        <div>
+            <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-success" aria-label="Close">
+                <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="flex flex-row items-center justify-between w-full">
+        <div class="w-full bg-gray-200 rounded-full h-1.5 mb-1 mt-2 dark:bg-gray-700">
+            <div id="animateDiv-danger" class="bg-red-400 h-1.5 rounded-full dark:bg-green-300 animate-[reduce_7s_ease-in-out_0s_1_forwards]" style="width: 100%"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showToastDanger() {
+        console.log("sda");
+        var toast = document.getElementById("toast-danger-create");
+        toast.classList.remove("hidden");
+        toast.classList.remove("animate-[fade-out_2s_ease-out_5s_1_forwards]");
+
+        // Đặt độ rộng về 100%
+        var animateDiv = document.getElementById('animateDiv-danger');
+        animateDiv.classList.remove("animate-[reduce_7s_ease-in-out_0s_1_forwards]");
+
+        // Gây ra sự tái tính toán kích thước
+        void toast.offsetWidth;
+
+        // Thêm lớp animation fade-out
+        toast.classList.add("animate-[fade-out_2s_ease-out_5s_1_forwards]");
+        animateDiv.classList.add("animate-[reduce_7s_ease-in-out_0s_1_forwards]");
+
+        // Thêm lớp để giảm độ rộng
+        animateDiv.classList.add("reduceWidth");
+
+        // Reset độ rộng sau khi animation hoàn tất
+        setTimeout(function () {
+            animateDiv.style.width = '100%'; // Đặt lại độ rộng về 100%
+        }, 2000);
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        var toast = document.getElementById("toast-danger-create");
+        if (toast.classList.contains("block")) {
+            document.getElementById('animateDiv-danger').classList.add("reduceWidth");
+            document.getElementById('animateDiv-danger').style.width = '0%';
+
+
+        }
+        function onTransitionEnd(event) {
+            if (event.propertyName === 'width' && animateDiv.style.width === '0%') {
+                document.getElementById('animateDiv-danger').classList.remove("reduceWidth");
+                //    document.getElementById('animateDiv').style.width = '100%';
+                //  console.log(document.getElementById('animateDiv').style.width);
+                //   toast.classList.add("animate-[fade-out_1s_ease-out_0.25s_1]");
+
+            }
+        }
+
+
+
+        document.getElementById('animateDiv-danger').addEventListener('transitionend', onTransitionEnd);
+    });
+</script>
+
+<script>
+    function showToastSuccess() {
+        var toast = document.getElementById("toast-success-create");
+        toast.classList.remove("hidden");
+        toast.classList.remove("animate-[fade-out_2s_ease-out_5s_1_forwards]");
+
+        // Đặt độ rộng về 100%
+        var animateDiv = document.getElementById('animateDiv-create');
+        animateDiv.classList.remove("animate-[reduce_7s_ease-in-out_0s_1_forwards]");
+
+        // Gây ra sự tái tính toán kích thước
+        void toast.offsetWidth;
+
+        // Thêm lớp animation fade-out
+        toast.classList.add("animate-[fade-out_2s_ease-out_5s_1_forwards]");
+        animateDiv.classList.add("animate-[reduce_7s_ease-in-out_0s_1_forwards]");
+
+        // Thêm lớp để giảm độ rộng
+        animateDiv.classList.add("reduceWidth");
+
+        // Reset độ rộng sau khi animation hoàn tất
+        setTimeout(function () {
+            animateDiv.style.width = '100%'; // Đặt lại độ rộng về 100%
+        }, 2000);
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        var toast = document.getElementById("toast-success-create");
+        if (toast.classList.contains("block")) {
+            document.getElementById('animateDiv-create').classList.add("reduceWidth");
+            document.getElementById('animateDiv-create').style.width = '0%';
+
+
+        }
+        function onTransitionEnd(event) {
+            if (event.propertyName === 'width' && animateDiv.style.width === '0%') {
+                document.getElementById('animateDiv-create').classList.remove("reduceWidth");
+                //    document.getElementById('animateDiv').style.width = '100%';
+                //  console.log(document.getElementById('animateDiv').style.width);
+                //   toast.classList.add("animate-[fade-out_1s_ease-out_0.25s_1]");
+
+            }
+        }
+
+
+
+        document.getElementById('animateDiv-create').addEventListener('transitionend', onTransitionEnd);
+    });
+</script>
+<script>
+    async function find(event) {
+        event.preventDefault();
+        const apiUrl = "https://localhost:7024/api/Gameplay/find?code=" + document.getElementById("code").value;
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'GET'
+            })
+            console.log(response);
+            if (response.ok) {
+                document.getElementById("formFind").style.display = "none";
+                document.getElementById("formJoin").style.display = "block";
+                showToastSuccess();
+            }
+            else {
+                throw new Error();
+            }
+        } catch (error) {
+            showToastDanger();
+
+            console.log(error);
+        }
+    }
+</script>
+
+<script>
+    async function join(event) {
+        event.preventDefault();
+        console.log(document.getElementById("usernameInputText"));
+        console.log(document.getElementById("code").value + " " + document.getElementById("usernameInputText").value);
+         window.location.href = "https://localhost:7081/Gameplay/Lobby?code=" + document.getElementById("code").value + "&username=" + document.getElementById("usernameInputText").value;
+
+    }
+</script>
+
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+<script>
+    // Function to check if the access token is valid
+    async function isAccessTokenValid() {
+        const token = getCookie('accessToken');
+        if (!token) return false;
+
+        try {
+            const response = await fetch('https://localhost:7024/api/Authentication/check', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) throw new Error('Error validating token');
+
+            const data = await response.json();
+
+            const usernameDisplay = document.getElementById('usernameShow');
+            const username = data.username;
+            usernameDisplay.innerHTML = 'Hello, ' + username;
+            return true;
+        } catch (error) {
+            console.error('Error making request:', error);
+            return false;
+        }
+    }
+
+    // Function to handle the authentication UI
+    async function handleAuthUI() {
+        const loginButton = document.querySelector('.login-btn');
+        const registerButton = document.querySelector('.register-btn');
+        const usernameDisplay = document.querySelector('.username');
+
+        const isValid = await isAccessTokenValid();
+
+        if (isValid) {
+            loginButton.style.display = 'none';
+            registerButton.style.display = 'none';
+            usernameDisplay.style.display = 'inline-block';
+        } else {
+            deleteCookie("accessToken");
+            loginButton.style.display = 'inline-block';
+            registerButton.style.display = 'inline-block';
+            usernameDisplay.style.display = 'none';
+        }
+    }
+
+    // Event listener for DOMContentLoaded to initialize UI
+    document.addEventListener('DOMContentLoaded', () => {
+        handleAuthUI();
+
+        const userMenu = document.getElementById('username');
+        const userMenuButton = document.getElementById('usernameShow');
+        const userDropdown = document.getElementById('userDropdown');
+        const changePasswordDialog = document.getElementById('changePasswordDialog');
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const changeErrorMessage = document.getElementById('changeErrorMessage');
+
+        const oldPwd = document.getElementById('oldPwd');
+        const newPwd = document.getElementById('newPwd');
+        const cfPwd = document.getElementById('cfPwd');
+
+        //User dropdown
+        userMenuButton.addEventListener('click', function () {
+            userDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!userMenu.contains(event.target)) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+
+        //Change password handle
+        oldPwd.addEventListener('input', () => {
+            changePasswordBtn.disabled = (!oldPwd.value || !newPwd.value || !cfPwd.value);
+        });
+
+        newPwd.addEventListener('input', () => {
+            changePasswordBtn.disabled = (!oldPwd.value || !newPwd.value || !cfPwd.value);
+        });
+
+        cfPwd.addEventListener('input', () => {
+            changePasswordBtn.disabled = (!oldPwd.value || !newPwd.value || !cfPwd.value);
+        });
+
+        window.showChangePasswordDialog = function () {
+            changePasswordDialog.classList.remove('hidden');
+        };
+
+        changePasswordBtn.addEventListener('click', async function () {
+            const oldPassword = oldPwd.value;
+            const newPassword = newPwd.value;
+            const confirmPassword = cfPwd.value;
+
+            if (newPassword !== confirmPassword) {
+                changeErrorMessage.textContent = 'New password and confirm password do not match.';
+                changeErrorMessage.classList.remove('hidden');
+                return;
+            }
+
+            const apiUrl = 'https://localhost:7024/api/Authentication/change';
+
+            try {
+                const token = getCookie('accessToken');
+                if (!token) {
+                    deleteCookie("accessToken");
+                    handleAuthUI();
+                }
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(newPassword)
+                });
+
+                if (!response.ok) {
+                    changeErrorMessage.textContent = response.text;
+                    changeErrorMessage.classList.remove('hidden');
+                } else {
+                    changeErrorMessage.textContent = '';
+                    changeErrorMessage.classList.add('hidden');
+                    changePasswordDialog.classList.add('hidden');
+                    alert("Change password successfully");
+                    deleteCookie("accessToken");
+                    window.location.href = '/authen/login';
+                }
+            } catch (error) {
+                changeErrorMessage.textContent = error;
+                changeErrorMessage.classList.remove('hidden');
+            }
+        });
+
+        changePasswordDialog.addEventListener('click', function (event) {
+            if (event.target === changePasswordDialog) {
+                changePasswordDialog.classList.add('hidden');
+            }
+        });
+
+        //Search input handle
+        const input = document.getElementById("searchInput");
+        input.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                if (input.value != '') {
+                    window.location.href = '/courses?search=' + input.value;
+                }
+            }
+        });
+    });
+</script>
+<script>
+    function setCookie(name, value, seconds) {
+        const date = new Date();
+        date.setTime(date.getTime() + (seconds * 1000));
+        const expires = `expires=${date.toUTCString()}`;
+        document.cookie = `${name}=${value}; ${expires}; path=/`;
+    }
+
+    function getCookieV2(key) {
+        const value = document.cookie;
+
+        const cookies = value.split('; ').reduce((acc, cookie) => {
+            const [k, v] = cookie.split('=');
+            acc[k] = decodeURIComponent(v);
+            return acc;
+        }, {});
+
+        return cookies[key];
+    }
+
+    function deleteCookie(name) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    }
+    function logout() {
+        deleteCookie("accessToken");
+        handleAuthUI();
+    }
+
+    // Function to check if the access token is valid
+    async function isAccessTokenValid() {
+        const token = getCookieV2('accessToken');
+        if (!token) return false;
+
+        try {
+            const response = await fetch('https://localhost:7024/api/Authentication/check', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) throw new Error('Error validating token');
+
+            const data = await response.json();
+
+            const usernameDisplay = document.getElementById('usernameShow');
+            const username = data.username;
+            usernameDisplay.innerHTML = 'Hello, ' + username;
+            return true;
+        } catch (error) {
+            console.error('Error making request:', error);
+            return false;
+        }
+    }
+
+    // Function to handle the authentication UI
+    async function handleAuthUI() {
+        const loginButton = document.querySelector('.login-btn');
+        const registerButton = document.querySelector('.register-btn');
+        const usernameDisplay = document.querySelector('.username');
+
+        const isValid = await isAccessTokenValid();
+
+        if (isValid) {
+            loginButton.style.display = 'none';
+            registerButton.style.display = 'none';
+            usernameDisplay.style.display = 'inline-block';
+        } else {
+            deleteCookie("accessToken");
+            loginButton.style.display = 'inline-block';
+            registerButton.style.display = 'inline-block';
+            usernameDisplay.style.display = 'none';
+        }
+    }
+
+    // Function to handle sidebar toggling
+    function updateSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.querySelector('.ml-0.md\\:ml-64');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const collapseSidebar = document.getElementById('collapseSidebar');
+        const menuText = document.getElementById('menuText');
+        const menuItemTexts = document.querySelectorAll('.menuItemText');
+
+        let isSidebarCollapsed = false;
+        let isSidebarOpen = window.innerWidth > 768;
+
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('-translate-x-full', !isSidebarOpen);
+            sidebar.classList.toggle('translate-x-0', isSidebarOpen);
+            mainContent.classList.remove('md:ml-64', 'md:ml-16');
+            mobileMenuToggle.classList.remove('hidden');
+            collapseSidebar.classList.add('hidden');
+        } else {
+            sidebar.classList.remove('-translate-x-full');
+            sidebar.classList.add('translate-x-0');
+            sidebar.classList.toggle('w-64', !isSidebarCollapsed);
+            sidebar.classList.toggle('w-16', isSidebarCollapsed);
+            mainContent.classList.toggle('md:ml-64', !isSidebarCollapsed);
+            mainContent.classList.toggle('md:ml-16', isSidebarCollapsed);
+            mobileMenuToggle.classList.add('hidden');
+            collapseSidebar.classList.toggle('hidden', isSidebarCollapsed);
+        }
+
+        menuText.classList.toggle('hidden', isSidebarCollapsed);
+        menuItemTexts.forEach(text => text.classList.toggle('hidden', isSidebarCollapsed));
+    }
+
+    // Debounced resize event listener to optimize performance
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(updateSidebar, 200);
+    });
+
+    // Function to toggle sidebar state
+    function toggleSidebarState() {
+        isSidebarOpen = !isSidebarOpen;
+        updateSidebar();
+    }
+
+    // Event listener for DOMContentLoaded to initialize UI
+    document.addEventListener('DOMContentLoaded', () => {
+        handleAuthUI();
+
+        const userMenu = document.getElementById('username');
+        const userMenuButton = document.getElementById('usernameShow');
+        const userDropdown = document.getElementById('userDropdown');
+        const changePasswordDialog = document.getElementById('changePasswordDialog');
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const changeErrorMessage = document.getElementById('changeErrorMessage');
+
+        const oldPwd = document.getElementById('oldPwd');
+        const newPwd = document.getElementById('newPwd');
+        const cfPwd = document.getElementById('cfPwd');
+
+        //User dropdown
+        userMenuButton.addEventListener('click', function () {
+            userDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!userMenu.contains(event.target)) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+
+        //Change password handle
+        oldPwd.addEventListener('input', () => {
+            changePasswordBtn.disabled = (!oldPwd.value || !newPwd.value || !cfPwd.value);
+        });
+
+        newPwd.addEventListener('input', () => {
+            changePasswordBtn.disabled = (!oldPwd.value || !newPwd.value || !cfPwd.value);
+        });
+
+        cfPwd.addEventListener('input', () => {
+            changePasswordBtn.disabled = (!oldPwd.value || !newPwd.value || !cfPwd.value);
+        });
+
+        window.showChangePasswordDialog = function () {
+            changePasswordDialog.classList.remove('hidden');
+        };
+
+        changePasswordBtn.addEventListener('click', async function () {
+            const oldPassword = oldPwd.value;
+            const newPassword = newPwd.value;
+            const confirmPassword = cfPwd.value;
+
+            if (newPassword !== confirmPassword) {
+                changeErrorMessage.textContent = 'New password and confirm password do not match.';
+                changeErrorMessage.classList.remove('hidden');
+                return;
+            }
+
+            const apiUrl = 'https://localhost:7024/api/Authentication/change';
+
+            try {
+                const token = getCookieV2('accessToken');
+                if (!token) {
+                    deleteCookie("accessToken");
+                    handleAuthUI();
+                }
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(newPassword)
+                });
+
+                if (!response.ok) {
+                    changeErrorMessage.textContent = response.text;
+                    changeErrorMessage.classList.remove('hidden');
+                } else {
+                    changeErrorMessage.textContent = '';
+                    changeErrorMessage.classList.add('hidden');
+                    changePasswordDialog.classList.add('hidden');
+                    alert("Change password successfully");
+                    deleteCookie("accessToken");
+                    window.location.href = '/authen/login';
+                }
+            } catch (error) {
+                changeErrorMessage.textContent = error;
+                changeErrorMessage.classList.remove('hidden');
+            }
+        });
+
+        changePasswordDialog.addEventListener('click', function (event) {
+            if (event.target === changePasswordDialog) {
+                changePasswordDialog.classList.add('hidden');
+            }
+        });
+
+        //Search input handle
+        const input = document.getElementById("searchInput");
+        input.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                if (input.value != '') {
+                    window.location.href = '/courses?search=' + input.value;
+                }
+            }
+        });
+
+        // Sidebar toggle event listeners
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const collapseSidebar = document.getElementById('collapseSidebar');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const menuText = document.getElementById('menuText');
+        const menuItemTexts = document.querySelectorAll('.menuItemText');
+        const mainContent = document.querySelector('.ml-0.md\\:ml-64');
+
+        let isSidebarCollapsed = false;
+        let isSidebarOpen = window.innerWidth > 768;
+
+        function updateSidebar() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('-translate-x-full', !isSidebarOpen);
+                sidebar.classList.toggle('translate-x-0', isSidebarOpen);
+                mainContent.classList.remove('md:ml-64', 'md:ml-16');
+                mobileMenuToggle.classList.remove('hidden');
+                collapseSidebar.classList.add('hidden');
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                sidebar.classList.toggle('w-64', !isSidebarCollapsed);
+                sidebar.classList.toggle('w-16', isSidebarCollapsed);
+                mainContent.classList.toggle('md:ml-64', !isSidebarCollapsed);
+                mainContent.classList.toggle('md:ml-16', isSidebarCollapsed);
+                mobileMenuToggle.classList.add('hidden');
+                collapseSidebar.classList.toggle('hidden', isSidebarCollapsed);
+            }
+
+            menuText.classList.toggle('hidden', isSidebarCollapsed);
+            menuItemTexts.forEach(text => {
+                text.classList.toggle('hidden', isSidebarCollapsed);
+            });
+        }
+
+        function toggleSidebarState() {
+            if (window.innerWidth <= 768) {
+                isSidebarOpen = !isSidebarOpen;
+            } else {
+                isSidebarCollapsed = !isSidebarCollapsed;
+            }
+            updateSidebar();
+        }
+
+        window.addEventListener('resize', updateSidebar);
+        updateSidebar();
+    });
+
+</script>

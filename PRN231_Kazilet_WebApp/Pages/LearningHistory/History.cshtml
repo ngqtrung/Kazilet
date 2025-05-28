@@ -1,0 +1,186 @@
+﻿@page
+@model PRN231_Kazilet_WebApp.Pages.LearningHistory.HistoryModel
+@{
+}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test options</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #471b43;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .input-text {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-bottom: 1px solid #33333350;
+            margin-bottom: 15px;
+            background-color: #ffffff;
+            color: #471b43;
+            transition: border-bottom 0.2s ease;
+        }
+
+            .input-text:hover {
+                border-bottom: 3px solid #33333350;
+            }
+
+            .input-text:disabled {
+                background-color: #e0e0e0;
+                color: #888888;
+            }
+
+        .input-select {
+            border: 1px solid #33333350;
+            border-radius: 6px;
+            color: #471b43;
+        }
+
+            .input-select:focus {
+                border: 1px solid #33333350;
+                border-radius: 6px;
+                color: #471b43;
+                background-color: #f2f2f2;
+            }
+
+            .input-select:hover {
+                cursor: pointer;
+                background-color: #f9f9f9;
+            }
+
+        .nextButton {
+            background-color: #8854c0;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+            .nextButton:hover {
+                background-color: #60255b;
+            }
+
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #33333350;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        }
+
+        .input-block {
+            margin-bottom: 10px;
+        }
+
+        .lhCard {
+            background-color: #ffffff;
+            border: 1px solid #33333350;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            transition: border-bottom 0.3s ease;
+        }
+
+            .lhCard:hover {
+                background-color: #ffffff;
+                border: 1px solid #33333350;
+                border-bottom: 5px solid #8854c0;
+                padding: 15px;
+                margin-bottom: 15px;
+                box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            }
+    </style>
+</head>
+<body>
+    <div class="container" style="padding: 0 5%; margin: 0 auto">
+        <div style="padding: 20px">
+            <h1>Recently taken courses</h1>
+            <div class="card">
+                <div style="display: flex; width: 100%; margin-bottom: 20px;">
+                    <div>
+                        <select class="input-select">
+                            <option value="ASC">ASC</option>
+                            <option value="DESC">DESC</option>
+                        </select>
+                    </div>
+                    <div style="width: 100%;">
+                        <input type="text" placeholder="Search by course name or creator" class="input-text" style="width: 50%; float: right" />
+                    </div>
+                </div>
+
+                @foreach (var lh in Model.LearningHistories)
+                {
+                    <div style="cursor:pointer" class="lhCard" data-date="@lh.LearningDate?.ToString("yyyy-MM-dd")" data-course="@lh.CourseName.ToLower()" data-creator="@lh.Creator.ToLower()">
+                        <div style="display: flex">
+                            <p style="margin-right: 10px;width:10%">@lh.numOfQues Questions</p>
+                            <p style="color:#e2e2e2;margin-right:10px">|</p>
+                            <p>@lh.Creator</p>
+                        </div>
+
+                        <p style="font-size:25px"><strong>@lh.CourseName</strong></p>
+                        <p style="font-size:14px;color:#a8a8a8">@lh.LearningDate?.ToString("dd/MM/yyyy")</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sortSelect = document.querySelector('.input-select');
+            const searchInput = document.querySelector('.input-text');
+            const lhCards = document.querySelectorAll('.lhCard');
+
+            function sortCards() {
+                const sortValue = sortSelect.value;
+                let sortedCards = Array.from(lhCards);
+
+                sortedCards.sort((a, b) => {
+                    const dateA = new Date(a.getAttribute('data-date'));
+                    const dateB = new Date(b.getAttribute('data-date'));
+
+                    if (sortValue === 'ASC') {
+                        return dateA - dateB;
+                    } else {
+                        return dateB - dateA;
+                    }
+                });
+
+                sortedCards.forEach(card => {
+                    card.parentNode.appendChild(card);
+                });
+            }
+
+            function searchCards() {
+                const searchText = searchInput.value.toLowerCase();
+                lhCards.forEach(card => {
+                    const courseName = card.getAttribute('data-course');
+                    const creator = card.getAttribute('data-creator');
+                    if (courseName.includes(searchText) || creator.includes(searchText)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            sortSelect.addEventListener('change', sortCards);
+            searchInput.addEventListener('input', searchCards);
+
+            sortCards();
+        });
+    </script>
+</body>
+</html>

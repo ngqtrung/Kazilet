@@ -1,0 +1,183 @@
+﻿@page
+@model PRN231_Kazilet_WebApp.Pages.Authen.LoginModel
+@{
+}
+
+<div class="bg-gray-900 min-h-screen flex items-center justify-center bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');">
+    <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+    <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md relative z-10">
+        <h2 class="text-3xl font-bold text-white mb-6 text-center">Đăng nhập</h2>
+        <form id="loginForm">
+            <div class="mb-4">
+                <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                <input type="email" id="email" name="email" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Mật khẩu</label>
+                <input type="password" id="password" name="password" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+            </div>
+            <div id="errorMessage" class="mb-4 text-red-500 text-sm hidden"></div>
+            <button type="submit"
+                    class="w-full bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary-dark transition duration-300">
+                Đăng nhập
+            </button>
+        </form>
+        <div class="mt-4 text-center">
+            <button id="forgotPasswordBtn" class="text-sm text-gray-400 hover:text-white">Quên mật khẩu?</button>
+        </div>
+        <div class="mt-6">
+            <form method="get" action="https://localhost:7024/api/authentication/google-login">
+                <button type="submit"
+                        class="w-full bg-white text-gray-900 py-2 px-4 rounded-md hover:bg-gray-200 transition duration-300 flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                    </svg>
+                    Đăng nhập bằng Google
+                </button>
+            </form>
+        </div>
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-400">
+                Chưa có tài khoản?
+                <a href="/authen/register" class="text-secondary hover:text-white">Đăng ký ngay</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Forgot Password Dialog -->
+    <div id="forgotPasswordDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
+            <h3 class="text-2xl font-bold text-white mb-4">Quên mật khẩu</h3>
+            <form id="forgotPasswordForm">
+                <div class="mb-4">
+                    <label for="resetEmail" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                    <input type="email" id="resetEmail" name="resetEmail" required
+                           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                </div>
+                <div id="resetErrorMessage" class="mb-4 text-red-500 text-sm hidden"></div>
+                <button type="submit" id="resetSubmitBtn" disabled
+                        class="w-full bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary-dark transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                    Gửi yêu cầu đặt lại mật khẩu
+                </button>
+            </form>
+            <button id="closeDialogBtn" class="mt-4 text-sm text-gray-400 hover:text-white">Đóng</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setCookie(name, value, seconds) {
+        const date = new Date();
+        date.setTime(date.getTime() + (seconds * 1000));
+        const expires = `expires=${date.toUTCString()}`;
+        document.cookie = `${name}=${value}; ${expires}; path=/`;
+    }
+
+    function getCookie(key) {
+        const value = document.cookie;
+
+        const cookies = value.split('; ').reduce((acc, cookie) => {
+            const [k, v] = cookie.split('=');
+            acc[k] = decodeURIComponent(v);
+            return acc;
+        }, {});
+
+        return cookies[key];
+    }
+
+    function deleteCookie(name) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const accessToken = getCookie("accessToken");
+        if (accessToken) {
+            window.location.href = "/";
+        }
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorMessage = document.getElementById('errorMessage');
+
+        const apiUrl = 'https://localhost:7024/api/Authentication/login';
+        const data = {
+            email: email,
+            password: password
+        };
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                errorMessage.textContent = "Wrong email or password. Try again!";
+                errorMessage.classList.remove('hidden');
+            } else { 
+                const result = await response.json();
+                let token = result.token;
+                setCookie("accessToken", token, 3600);
+                console.log('Success:', token);
+                errorMessage.textContent = '';
+                errorMessage.classList.add('hidden');
+                window.location.href = "/";
+            }
+        } catch (error) {
+            errorMessage.textContent = error;
+            errorMessage.classList.remove('hidden');
+        }
+    });
+
+    // Forgot password dialog
+    const forgotPasswordDialog = document.getElementById('forgotPasswordDialog');
+    const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+    const closeDialogBtn = document.getElementById('closeDialogBtn');
+    const resetEmail = document.getElementById('resetEmail');
+    const resetSubmitBtn = document.getElementById('resetSubmitBtn');
+    const resetErrorMessage = document.getElementById('resetErrorMessage');
+
+    forgotPasswordBtn.addEventListener('click', () => {
+        forgotPasswordDialog.classList.remove('hidden');
+    });
+
+    closeDialogBtn.addEventListener('click', () => {
+        forgotPasswordDialog.classList.add('hidden');
+        resetEmail.value = '';
+        resetErrorMessage.classList.add('hidden');
+    });
+
+    resetEmail.addEventListener('input', () => {
+        resetSubmitBtn.disabled = !resetEmail.value;
+    });
+
+    document.getElementById('forgotPasswordForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const email = resetEmail.value;
+
+        // Fetch data from the API
+        const response = await fetch('https://localhost:7024/api/Authentication/forgot?email=' + email);
+        // Simulated email validation (replace with actual API call)
+        if (response.ok) {
+            resetErrorMessage.textContent = '';
+            resetErrorMessage.classList.add('hidden');
+            alert('Yêu cầu đặt lại mật khẩu đã được gửi đến email của bạn.');
+            forgotPasswordDialog.classList.add('hidden');
+            resetEmail.value = '';
+        } else {
+            resetErrorMessage.textContent = 'Email không tồn tại trong hệ thống. Vui lòng thử lại.';
+            resetErrorMessage.classList.remove('hidden');
+        }
+    });
+</script>

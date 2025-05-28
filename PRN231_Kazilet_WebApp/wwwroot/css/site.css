@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+html {
+    font-size: 14px;
+    font-family: ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
+}
+
+@media (min-width: 768px) {
+  html {
+    background-color: #FAFAFA;
+    font-size: 16px;
+  }
+}
+
+.container{
+    max-width: 100% !important;
+}
+
+html {
+    background-color: #FAFAFA;
+   position: relative;
+    min-height: 100%;
+}
+
+ @media (min-width: 1024px) {
+    .cover {
+    border-bottom-right-radius: 256px;
+    }
+ }
+
+#menu-toggle:checked + #menu {
+    display: block;
+}
+
+#dropdown-toggle:checked + #dropdown {
+    display: block;
+}
+

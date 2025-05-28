@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PRN231_Kazilet_WebApp</title>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css?v=1" asp-append-version="true" />
+    <link href="~/css/output.css" rel="stylesheet" />
+    <script src="~/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+    <link rel="stylesheet" href="~/PRN231_Kazilet_WebApp.styles.css" asp-append-version="true" />
+    <style>
+        @@keyframes pop {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.5);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @@keyframes increase-height {
+            0% {
+                height: 0;
+                opacity: 0;
+            }
+
+            100% {
+                height: var(--target-height); /* Sử dụng biến để xác định chiều cao */
+                opacity: 1;
+            }
+        }
+
+        /* Lớp CSS để thêm vào các cột */
+        .animate-height {
+            animation: increase-height 1s ease-out forwards;
+        }
+
+        .animate-pop {
+            animation: pop 1s ease-in-out;
+        }
+
+        .shadow {
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        }
+
+        .shadow-black {
+            box-shadow: rgb(0, 0, 0) 0px 3px 8px;
+        }
+
+        .filter-red {
+            filter: invert(45%) sepia(51%) saturate(6559%) hue-rotate(328deg) brightness(95%) contrast(109%);
+        }
+
+        .filter-green {
+            filter: invert(64%) sepia(53%) saturate(597%) hue-rotate(55deg) brightness(94%) contrast(81%);
+        }
+    </style>
+
+    <style>
+        #animateDiv-create {
+            width: 100%;
+        }
+
+        .reduceWidth {
+            transition: width 2s ease-out;
+            width: 0%;
+        }
+    </style>
+
+</head>
+<body>
+    
+    <div class="container h-full">
+        <main role="main" class="pb-3 w-full h-full" style="background: #f9f9f9">
+            @RenderBody()
+        </main>
+    </div>
+
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

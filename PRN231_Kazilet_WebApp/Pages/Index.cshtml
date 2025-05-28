@@ -1,0 +1,572 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<!-- Change Password Dialog -->
+<div id="changePasswordDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
+        <h3 class="text-2xl font-bold text-white mb-4">Change password</h3>
+        <form class="mt-3" id="changePasswordForm">
+            <div class="mb-4">
+                <label for="oldPwd" class="block text-sm font-medium text-gray-300 mb-2">Old Password</label>
+                <input type="password" id="oldPwd" name="oldPwd" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                <label for="newPwd" class="block text-sm font-medium text-gray-300 mb-2">New Password</label>
+                <input type="password" id="newPwd" name="newPwd" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                <label for="cfPwd" class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+                <input type="password" id="cfPwd" name="cfPwd" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+            </div>
+            <div id="changeErrorMessage" class="mb-4 text-red-500 text-sm hidden"></div>
+            <button type="button" id="changePasswordBtn" disabled
+                    class="w-full bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary-dark transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                Change Password
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="min-h-screen bg-white flex">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="bg-white border-r border-gray-200 transition-all duration-300 ease-in-out fixed inset-y-0 left-0 z-50 w-64 transform -translate-x-full md:translate-x-0">
+        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+            <button id="toggleSidebar" class="text-primary hover:text-secondary focus:outline-none flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                <span id="menuText" class="ml-2">Menu</span>
+            </button>
+            <button id="collapseSidebar" class="text-primary hover:text-secondary focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+        </div>
+        <nav class="py-4">
+            <ul class="space-y-3">
+                <li class="py-2 pl-4 hover:bg-gray-100 cursor-pointer" onclick="window.location.href = '/'">
+                    <button class="text-left text-primary rounded-md flex items-center focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <span class="menuItemText ml-2 truncate">Home</span>
+                    </button>
+                </li>
+                <li class="py-2 pl-4 hover:bg-gray-100 cursor-pointer" onclick="window.location.href = '/folders'">
+                    <button class="text-left text-primary rounded-md flex items-center focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                        </svg>
+                        <span class="menuItemText ml-2 truncate">Folder</span>
+                    </button>
+                </li>
+                <li class="py-2 pl-4 hover:bg-gray-100 cursor-pointer" onclick="window.location.href = '/courses/mycourse'">
+                    <button class="text-left text-primary rounded-md flex items-center focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        <span class="menuItemText ml-2 truncate">My Courses</span>
+                    </button>
+                </li>
+                <li class="py-2 pl-4 hover:bg-gray-100 cursor-pointer" onclick="window.location.href = '/gameplay/list'">
+                    <button class="text-left text-primary rounded-md flex items-center focus:outline-none">
+                        <svg class="h-6 w-6" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z" />  <rect x="2" y="6" width="20" height="12" rx="2" />  <path d="M6 12h4m-2 -2v4" />  <line x1="15" y1="11" x2="15" y2="11.01" />  <line x1="18" y1="13" x2="18" y2="13.01" /></svg>
+                        <span class="menuItemText ml-2 truncate">My Games</span>
+                    </button>
+                </li>
+                @* <li class="py-2 pl-4 hover:bg-gray-100 cursor-pointer">
+                <button class="text-left text-primary rounded-md flex items-center focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span class="menuItemText ml-2 truncate">Notifications</span>
+                </button>
+                </li> *@
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 ml-0 md:ml-64 transition-all duration-300 ease-in-out">
+        <!-- Search Header -->
+        <header class="border-b border-gray-200 sticky top-0 bg-white z-10">
+            <div class="container mx-auto px-4 py-4 flex items-center">
+                <button id="mobileMenuToggle" class="mr-2 md:hidden text-primary hover:text-secondary focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                <div class="flex-shrink-0 mr-2">
+                    <a href="/" class="text-primary text-2xl font-bold">Kazilet</a>
+                </div>
+                <div class="relative flex-1">
+                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search course..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent">
+                </div>
+                <div class="flex items-center ml-2">
+                    <button onclick="window.location.href='/gameplay/join'" class="text-gray-700 bg-gray-100 hover:text-gray-900 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium">
+                        Join game
+                    </button>
+                    <button onclick="window.location.href='/authen/login'" class="login-btn text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                        Login
+                    </button>
+                    <button onclick="window.location.href='/authen/register'" class="register-btn bg-secondary hover:bg-primary text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                        Register
+                    </button>
+                    @* <span class="username text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-semibold" style="display: none;"></span> *@
+                    <div class="relative username" id="username" style="display: none;">
+                        <button id="usernameShow" class="text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-semibold"></button>
+                        <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="showChangePasswordDialog()">Change Password</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="logout()">Logout</a>
+                        </div>
+                    </div>
+                    @* <button onclick="logout()" class="logout-btn bg-secondary hover:bg-primary text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out" style="display: none;">
+                    Logout
+                    </button> *@
+                </div>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 py-8">
+            <!-- Welcome Section -->
+            <h1 id="history-header" class="hidden text-3xl font-bold text-primary mb-8">
+                What did you learn?
+            </h1>
+
+            <!-- Categories -->
+            <div id="history" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-4 mb-12">
+            </div>
+
+            <!-- Courses Search -->
+            <div class="mb-12 hidden" id="search-field">
+                <div class="flex items-center mb-6 space-x-3">
+                    <h2 class="text-2xl font-bold text-primary">Search for </h2><span id="searchHeader" class="text-xl font-bold"></span>
+                </div>
+
+                <div id="courses-search" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+
+                <div class="w-full flex items-center justify-center hidden" id="empty">
+                    <h2 class="font-bold text-gray-200">No course found</h2>
+                </div>
+            </div>
+
+            <!-- Courses Section -->
+            <div class="mb-12">
+                <div class="flex items-center mb-6 space-x-3">
+                    <h2 class="text-2xl font-bold text-primary">Popular courses</h2>
+                </div>
+                <div id="courses" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    function logout() {
+        deleteCookie("accessToken");
+        handleAuthUI();
+    }
+    function setCookie(name, value, seconds) {
+        const date = new Date();
+        date.setTime(date.getTime() + (seconds * 1000));
+        const expires = `expires=${date.toUTCString()}`;
+        document.cookie = `${name}=${value}; ${expires}; path=/`;
+    }
+
+    function getCookie(key) {
+        const value = document.cookie;
+
+        const cookies = value.split('; ').reduce((acc, cookie) => {
+            const [k, v] = cookie.split('=');
+            acc[k] = decodeURIComponent(v);
+            return acc;
+        }, {});
+
+        return cookies[key];
+    }
+
+    function deleteCookie(name) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    }
+
+    async function loadCoursesHistory() {
+        const token = getCookie("accessToken");
+        const categoryContainer = document.getElementById('history');
+        const categoryHeader = document.getElementById('history-header');
+
+        // Check if the cookie exists and has a value
+        if (!token) {
+            console.log("No token found in cookies.");
+            return;
+        }
+
+        try {
+            const response = await fetch('https://localhost:7024/api/LearningHistory', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            if (!response.ok) {
+                console.error("Failed to fetch courses:", response.statusText);
+                return;
+            }
+
+            const courses = await response.json();
+            if (courses.length > 0) {
+                categoryContainer.classList.remove('hidden');
+                categoryHeader.classList.remove('hidden');
+            }
+
+            // Loop through each course and create a category item
+            courses.forEach(course => {
+                const categoryItem = document.createElement("a");
+                categoryItem.href = "/questions?courseId=" + course.courseId;
+                categoryItem.className = "flex flex-col items-center group";
+
+                categoryItem.innerHTML = `
+                            <div class="w-16 h-16 rounded-full bg-secondary bg-opacity-10 flex items-center justify-center text-2xl mb-2 group-hover:bg-secondary-dark group-hover:bg-opacity-20 transition-colors">
+                                <img class="h-10 w-10" src="~/imgs/learning.png" alt="${course.courseName}">
+                            </div>
+                                <span class="text-sm text-center text-primary">${course.courseName}</span>
+                        `;
+
+                categoryContainer.appendChild(categoryItem);
+            });
+        } catch (error) {
+            console.error("Error loading courses:", error);
+        }
+    }
+
+    async function loadCourses() {
+        try {
+            // Fetch data from the API
+            const response = await fetch('https://localhost:7024/api/LearningHistory/GetTopCourse');
+            const courses = await response.json();
+
+            const coursesContainer = document.getElementById('courses');
+
+            courses.forEach(course => {
+                const courseCard = document.createElement('a');
+                courseCard.href = "/questions?courseId=" + course.id;
+                courseCard.className = "block";
+
+                courseCard.innerHTML = `
+                            <div class="border border-gray-200 rounded-lg overflow-hidden transition-shadow hover:shadow-lg">
+                                    <img src="/imgs/course.jpg" alt="${course.name}" class="w-full h-48 object-cover">
+                                <div class="p-4">
+                                    <div class="text-sm text-gray-600 mb-2">${course.name}</div>
+                                    <h3 class="text-lg font-semibold mb-2">${course.description}</h3>
+                                    <div class="text-sm text-gray-600">${course.numOfQues} Terms</div>
+                                </div>
+                            </div>
+                        `;
+
+                coursesContainer.appendChild(courseCard);
+            });
+        } catch (error) {
+            console.error("Error loading courses:", error);
+        }
+    }
+
+    // Function to check if the access token is valid
+    async function isAccessTokenValid() {
+        const token = getCookie('accessToken');
+        if (!token) return false;
+
+        try {
+            const response = await fetch('https://localhost:7024/api/Authentication/check', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) throw new Error('Error validating token');
+
+            const data = await response.json();
+
+            const usernameDisplay = document.getElementById('usernameShow');
+            const username = data.username;
+            usernameDisplay.innerHTML = 'Hello, ' + username;
+            return true;
+        } catch (error) {
+            console.error('Error making request:', error);
+            return false;
+        }
+    }
+
+    // Function to handle the authentication UI
+    async function handleAuthUI() {
+        const loginButton = document.querySelector('.login-btn');
+        const registerButton = document.querySelector('.register-btn');
+        const usernameDisplay = document.querySelector('.username');
+
+        const isValid = await isAccessTokenValid();
+
+        if (isValid) {
+            loginButton.style.display = 'none';
+            registerButton.style.display = 'none';
+            usernameDisplay.style.display = 'inline-block';
+        } else {
+            deleteCookie("accessToken");
+            loginButton.style.display = 'inline-block';
+            registerButton.style.display = 'inline-block';
+            usernameDisplay.style.display = 'none';
+        }
+    }
+
+    // Function to handle sidebar toggling
+    function updateSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.querySelector('.ml-0.md\\:ml-64');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const collapseSidebar = document.getElementById('collapseSidebar');
+        const menuText = document.getElementById('menuText');
+        const menuItemTexts = document.querySelectorAll('.menuItemText');
+
+        let isSidebarCollapsed = false;
+        let isSidebarOpen = window.innerWidth > 768;
+
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('-translate-x-full', !isSidebarOpen);
+            sidebar.classList.toggle('translate-x-0', isSidebarOpen);
+            mainContent.classList.remove('md:ml-64', 'md:ml-16');
+            mobileMenuToggle.classList.remove('hidden');
+            collapseSidebar.classList.add('hidden');
+        } else {
+            sidebar.classList.remove('-translate-x-full');
+            sidebar.classList.add('translate-x-0');
+            sidebar.classList.toggle('w-64', !isSidebarCollapsed);
+            sidebar.classList.toggle('w-16', isSidebarCollapsed);
+            mainContent.classList.toggle('md:ml-64', !isSidebarCollapsed);
+            mainContent.classList.toggle('md:ml-16', isSidebarCollapsed);
+            mobileMenuToggle.classList.add('hidden');
+            collapseSidebar.classList.toggle('hidden', isSidebarCollapsed);
+        }
+
+        menuText.classList.toggle('hidden', isSidebarCollapsed);
+        menuItemTexts.forEach(text => text.classList.toggle('hidden', isSidebarCollapsed));
+    }
+
+    // Debounced resize event listener to optimize performance
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(updateSidebar, 200);
+    });
+
+    // Function to toggle sidebar state
+    function toggleSidebarState() {
+        isSidebarOpen = !isSidebarOpen;
+        updateSidebar();
+    }
+
+    // Event listener for DOMContentLoaded to initialize UI
+    document.addEventListener('DOMContentLoaded', () => {
+        handleAuthUI();
+        loadCoursesHistory();
+        loadCourses();
+
+        const userMenu = document.getElementById('username');
+        const userMenuButton = document.getElementById('usernameShow');
+        const userDropdown = document.getElementById('userDropdown');
+        const changePasswordDialog = document.getElementById('changePasswordDialog');
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const changeErrorMessage = document.getElementById('changeErrorMessage');
+
+        const oldPwd = document.getElementById('oldPwd');
+        const newPwd = document.getElementById('newPwd');
+        const cfPwd = document.getElementById('cfPwd');
+
+        //User dropdown
+        userMenuButton.addEventListener('click', function () {
+            userDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!userMenu.contains(event.target)) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+
+        //Change password handle
+        oldPwd.addEventListener('input', () => {
+            changePasswordBtn.disabled = (!oldPwd.value || !newPwd.value || !cfPwd.value);
+        });
+
+        newPwd.addEventListener('input', () => {
+            changePasswordBtn.disabled = (!oldPwd.value || !newPwd.value || !cfPwd.value);
+        });
+
+        cfPwd.addEventListener('input', () => {
+            changePasswordBtn.disabled = (!oldPwd.value || !newPwd.value || !cfPwd.value);
+        });
+
+        window.showChangePasswordDialog = function () {
+            changePasswordDialog.classList.remove('hidden');
+        };
+
+        changePasswordBtn.addEventListener('click', async function () {
+            const oldPassword = oldPwd.value;
+            const newPassword = newPwd.value;
+            const confirmPassword = cfPwd.value;
+
+            if (newPassword !== confirmPassword) {
+                changeErrorMessage.textContent = 'New password and confirm password do not match.';
+                changeErrorMessage.classList.remove('hidden');
+                return;
+            }
+
+            const apiUrl = 'https://localhost:7024/api/Authentication/change';
+
+            try {
+                const token = getCookie('accessToken');
+                if (!token) {
+                    deleteCookie("accessToken");
+                    handleAuthUI();
+                }
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(newPassword)
+                });
+
+                if (!response.ok) {
+                    changeErrorMessage.textContent = response.text;
+                    changeErrorMessage.classList.remove('hidden');
+                } else {
+                    changeErrorMessage.textContent = '';
+                    changeErrorMessage.classList.add('hidden');
+                    changePasswordDialog.classList.add('hidden');
+                    alert("Change password successfully");
+                    deleteCookie("accessToken");
+                    window.location.href = '/authen/login';
+                }
+            } catch (error) {
+                changeErrorMessage.textContent = error;
+                changeErrorMessage.classList.remove('hidden');
+            }
+        });
+
+        changePasswordDialog.addEventListener('click', function (event) {
+            if (event.target === changePasswordDialog) {
+                changePasswordDialog.classList.add('hidden');
+            }
+        });
+
+        //Search input handle
+        const input = document.getElementById("searchInput");
+        input.addEventListener("keydown", async function (event) {
+            if (event.key === "Enter") {
+                const coursesContainer = document.getElementById('courses-search');
+                coursesContainer.innerHTML = '';
+
+                event.preventDefault();
+                if (input.value != '') {
+                    document.getElementById('search-field').classList.remove('hidden');
+                    document.getElementById('searchHeader').innerHTML = `'${input.value}'`;
+
+                    try {
+                        // Fetch data from the API
+                        const response = await fetch('https://localhost:7024/api/Courses/search?search=' + input.value);
+                        const courses = await response.json();
+
+                        if (courses.length == 0) {
+                            document.getElementById('empty').classList.remove('hidden');
+                        } else {
+                            document.getElementById('empty').classList.add('hidden');
+                        }
+
+                        courses.forEach(course => {
+                            const courseCard = document.createElement('a');
+                            courseCard.href = "/questions?courseId=" + course.id;
+                            courseCard.className = "block";
+
+                            courseCard.innerHTML = `
+                                <div class="border border-gray-200 rounded-lg overflow-hidden transition-shadow hover:shadow-lg">
+                                    <div class="p-4">
+                                        <div class="text-sm font-bold text-gray-600 mb-2">${course.name}</div>
+                                        <div class="text-sm text-gray-600">${course.numOfQues} Terms</div>
+                                    </div>
+                                </div>
+                            `;
+
+                            coursesContainer.appendChild(courseCard);
+                        });
+                    } catch (error) {
+                        console.error("Error loading courses:", error);
+                    }
+                }
+            }
+        });
+
+        // Sidebar toggle event listeners
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const collapseSidebar = document.getElementById('collapseSidebar');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const menuText = document.getElementById('menuText');
+        const menuItemTexts = document.querySelectorAll('.menuItemText');
+        const mainContent = document.querySelector('.ml-0.md\\:ml-64');
+
+        let isSidebarCollapsed = false;
+        let isSidebarOpen = window.innerWidth > 768;
+
+        function updateSidebar() {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('-translate-x-full', !isSidebarOpen);
+                sidebar.classList.toggle('translate-x-0', isSidebarOpen);
+                mainContent.classList.remove('md:ml-64', 'md:ml-16');
+                mobileMenuToggle.classList.remove('hidden');
+                collapseSidebar.classList.add('hidden');
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                sidebar.classList.toggle('w-64', !isSidebarCollapsed);
+                sidebar.classList.toggle('w-16', isSidebarCollapsed);
+                mainContent.classList.toggle('md:ml-64', !isSidebarCollapsed);
+                mainContent.classList.toggle('md:ml-16', isSidebarCollapsed);
+                mobileMenuToggle.classList.add('hidden');
+                collapseSidebar.classList.toggle('hidden', isSidebarCollapsed);
+            }
+
+            menuText.classList.toggle('hidden', isSidebarCollapsed);
+            menuItemTexts.forEach(text => {
+                text.classList.toggle('hidden', isSidebarCollapsed);
+            });
+        }
+
+        function toggleSidebarState() {
+            if (window.innerWidth <= 768) {
+                isSidebarOpen = !isSidebarOpen;
+            } else {
+                isSidebarCollapsed = !isSidebarCollapsed;
+            }
+            updateSidebar();
+        }
+
+        toggleSidebar.addEventListener('click', toggleSidebarState);
+        collapseSidebar.addEventListener('click', toggleSidebarState);
+        mobileMenuToggle.addEventListener('click', toggleSidebarState);
+
+        window.addEventListener('resize', updateSidebar);
+        updateSidebar();
+    });
+
+</script>

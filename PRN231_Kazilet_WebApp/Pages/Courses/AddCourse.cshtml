@@ -1,0 +1,390 @@
+﻿@page
+@model PRN231_Kazilet_WebApp.Pages.Courses.AddCourseModel
+@{
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a new flashcard set</title>
+    <style>
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            border-radius: 3px;
+            border: 1px solid #33333350;
+        }
+
+            .custom-checkbox:checked {
+                background-color: #8854c0;
+            }
+
+        [type=checkbox]:focus, [type=radio]:focus {
+            box-shadow: none;
+            outline: none;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #471b43;
+        }
+
+        .container {
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+
+        .subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #33333350;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-number {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .card-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .term, .definition {
+            flex: 1 1 45%;
+            min-width: 200px;
+        }
+
+        .language-select {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+            text-align: right;
+        }
+
+        .inputField {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-bottom: 1px solid rgba(51, 51, 51, 0.3);
+            margin-bottom: 15px;
+            background-color: #fff;
+            color: #471b43;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            background-color: #8854c0;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+        }
+
+            .btn:hover {
+                background-color: #6e3f99;
+            }
+
+        .add-card {
+            width: 70%;
+            margin-left: 15%;
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 16px;
+        }
+
+        .add-definition {
+            background-color: #ffffff;
+            border: 1px dashed #333;
+            width: 100%;
+            margin-top: 10px;
+            color: #471b43;
+        }
+
+            .add-definition:hover {
+                background-color: #60255b1f;
+            }
+
+        .definition-container {
+            position: relative;
+            width: 98%;
+        }
+
+        .remove-definition {
+            position: absolute;
+            right: -25px;
+            top: 25%;
+            transform: translateY(-50%);
+            background-color: transparent;
+            color: #888;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+        }
+
+            .remove-definition:hover {
+                color: #fff;
+            }
+    </style>
+</head>
+<div id="changePasswordDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
+        <h3 class="text-2xl font-bold text-white mb-4">Change password</h3>
+        <form class="mt-3" id="changePasswordForm">
+            <div class="mb-4">
+                <label for="oldPwd" class="block text-sm font-medium text-gray-300 mb-2">Old Password</label>
+                <input type="password" id="oldPwd" name="oldPwd" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                <label for="newPwd" class="block text-sm font-medium text-gray-300 mb-2">New Password</label>
+                <input type="password" id="newPwd" name="newPwd" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                <label for="cfPwd" class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+                <input type="password" id="cfPwd" name="cfPwd" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+            </div>
+            <div id="changeErrorMessage" class="mb-4 text-red-500 text-sm hidden"></div>
+            <button type="button" id="changePasswordBtn" disabled
+                    class="w-full bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary-dark transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                Change Password
+            </button>
+        </form>
+    </div>
+</div>
+<header class="border-b border-gray-200 sticky top-0 bg-white z-10">
+    <div class="container mx-auto px-4 py-4 flex items-center">
+        <button id="mobileMenuToggle" class="mr-2 md:hidden text-primary hover:text-secondary focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+        <div class="flex-shrink-0 mr-2">
+            <a href="/" class="text-primary text-2xl font-bold">Kazilet</a>
+        </div>
+        <div class="relative flex-1">
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="searchInput" placeholder="Search course..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent">
+        </div>
+        <div class="flex items-center ml-2">
+            <button onclick="window.location.href='/gameplay/join'" class="text-gray-700 bg-gray-100 hover:text-gray-900 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium">
+                Join game
+            </button>
+            <button onclick="window.location.href='/authen/login'" class="login-btn text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                Login
+            </button>
+            <button onclick="window.location.href='/authen/register'" class="register-btn bg-secondary hover:bg-primary text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                Register
+            </button>
+            @* <span class="username text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-semibold" style="display: none;"></span> *@
+            <div class="relative username" id="username" style="display: none;">
+                <button id="usernameShow" class="text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-semibold"></button>
+                <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="showChangePasswordDialog()">Change Password</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="logout()">Logout</a>
+                </div>
+            </div>
+            @* <button onclick="logout()" class="logout-btn bg-secondary hover:bg-primary text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out" style="display: none;">
+            Logout
+            </button> *@
+        </div>
+    </div>
+</header>
+<body>
+    <div class="container" style="padding: 10px 5%">
+        <div style="display:flex; justify-content: space-between; margin-bottom: 20px">
+            <h1 style="font-size:25px">Create a new course</h1>
+            <button class="btn" onclick="submitForm()">Create</button>
+        </div>
+        <input type="text" id="title" class="inputField" placeholder="Enter a title">
+        <textarea style="width:100%" id="description" class="textAreaField" placeholder="Add a description..."></textarea>
+        <div style="display: flex; justify-content:space-between">
+            <div style="display: flex; align-items: center">
+                <div style="display: flex; align-items: center">
+                    <label for="publicCheckbox">Private Course</label>
+                    <input class="custom-checkbox mb-0 ml-2" type="checkbox" id="publicCheckbox" onchange="togglePasswordField()">
+                    <div id="passwordContainer" style="display: none; margin-left: 10px;">
+                        <input class="mb-0" type="password" id="password" placeholder="Enter password" style="width: 100%">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button class="btn" style="background:none;color: #471b43;border:1px solid #33333350; margin-bottom:10px">Import Questions</button>
+            </div>
+        </div>
+        <div id="flashcards"></div>
+        <button class="btn add-card" onclick="addCard()">Add a question</button>
+    </div>
+</body>
+
+<script>
+    let cardCount = 0;
+
+    function addCard() {
+        cardCount++;
+        const flashcardsContainer = document.getElementById('flashcards');
+        const newCard = document.createElement('div');
+        newCard.className = 'card';
+        newCard.innerHTML = `
+                        <div class="card-header">
+                            <span class="card-number">${cardCount}</span>
+                            <div>
+                                <button class="btn" onclick="removeCard(this)">×</button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="term">
+                                <input type="text" class="inputField question-content" placeholder="Enter question">
+                            </div>
+                            <div class="definition">
+                                <div class="definition-container" style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" class="custom-checkbox" style="margin-right: 5px; border: 1px solid #33333350; margin-top: 4px;">
+                                    <input type="text" class="inputField" placeholder="Enter answer">
+                                </div>
+                                <button class="btn add-definition" onclick="addDefinition(this)">+ Add another answer</button>
+                            </div>
+                        </div>
+                    `;
+        flashcardsContainer.appendChild(newCard);
+    }
+
+    function addDefinition(button) {
+        const definitionContainer = button.parentElement;
+        const newDefinition = document.createElement('div');
+        newDefinition.className = 'definition-container';
+        newDefinition.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" class="custom-checkbox" style="margin-right: 5px; border: 1px solid #33333350; margin-top: 4px;">
+                            <input type="text" class="inputField" placeholder="Enter answer">
+                            <button class="btn remove-definition" onclick="removeDefinition(this)">×</button>
+                        </div>
+                    `;
+        definitionContainer.insertBefore(newDefinition, button);
+    }
+
+    function removeDefinition(button) {
+        const definitionContainer = button.closest('.definition');
+        const definitions = definitionContainer.querySelectorAll('.definition-container');
+        if (definitions.length > 1) {
+            button.closest('.definition-container').remove();
+        } else {
+            alert("You must have at least one definition for each term.");
+        }
+    }
+
+    function removeCard(button) {
+        const card = button.closest('.card');
+        card.remove();
+    }
+
+    function submitForm() {
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const isPublic = document.getElementById('publicCheckbox').checked;
+        const password = isPublic ? document.getElementById('password').value.trim() : null;
+
+        const questions = [];
+        const terms = document.querySelectorAll('.question-content');
+        const allDefinitions = document.querySelectorAll('.definition');
+
+        for (let i = 0; i < terms.length; i++) {
+            const questionContent = terms[i].value.trim();
+            const answers = [];
+
+            const definitions = allDefinitions[i].querySelectorAll('.definition-container input[type="text"]');
+            const checkboxes = allDefinitions[i].querySelectorAll('.definition-container input[type="checkbox"]');
+
+            for (let j = 0; j < definitions.length; j++) {
+                const definitionContent = definitions[j].value.trim();
+                const isCorrect = checkboxes[j].checked;
+
+                if (definitionContent) {
+                    answers.push({
+                        content: definitionContent,
+                        isCorrect: isCorrect
+                    });
+                }
+            }
+
+            questions.push({
+                content: questionContent,
+                answers: answers
+            });
+        }
+
+        const courseData = {
+            name: title,
+            description: description,
+            createdAt: new Date().toISOString(),
+            createdBy: 1,  // Assuming the creator has ID 1
+            coursePassword: password,
+            isPublic: !isPublic,
+            status: null,
+            folders: [],
+            gameplaySettings: [],
+            learningHistories: [],
+            questions: questions
+        };
+
+        fetch('https://localhost:7024/api/Courses/Add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(courseData),
+        }).then(data => {
+            if (data.ok) {
+                window.location.href = `/Courses/MyCourse`;
+            } else {
+                alert('Failed to create course!');
+            }
+        })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while creating the course.');
+            });
+    }
+
+    function togglePasswordField() {
+        const passwordContainer = document.getElementById('passwordContainer');
+        const publicCheckbox = document.getElementById('publicCheckbox');
+        if (publicCheckbox.checked) {
+            passwordContainer.style.display = 'block';
+        } else {
+            passwordContainer.style.display = 'none';
+        }
+    }
+
+    addCard();
+    addCard();
+</script>
+
+</html>

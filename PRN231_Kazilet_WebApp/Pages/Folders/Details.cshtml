@@ -1,0 +1,378 @@
+﻿@page
+@model PRN231_Kazilet_WebApp.Pages.Folders.DetailsModel
+@{
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0 auto;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #471b43;
+        }
+
+        .modified-date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            background-color: #8854c0;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .btn:hover {
+                background-color: #60255b;
+            }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 5% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+            .close:hover {
+                color: #333;
+            }
+
+        .flashcard-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .flashcard-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+            .flashcard-item:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            }
+
+        .flashcard-icon {
+            font-size: 24px;
+            color: #471b43;
+            margin-right: 20px;
+        }
+
+        .flashcard-info {
+            flex-grow: 1;
+        }
+
+        .flashcard-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .flashcard-details {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .add-course-btn, .remove-course-btn {
+            padding: 5px 10px;
+            border: none;
+            background-color: #34a853;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .remove-course-btn {
+            background-color: #ea4335;
+        }
+
+        .add-course-btn:hover {
+            background-color: #2d8e47;
+        }
+
+        .remove-course-btn:hover {
+            background-color: #d33426;
+        }
+    </style>
+</head>
+<div id="changePasswordDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
+        <h3 class="text-2xl font-bold text-white mb-4">Change password</h3>
+        <form class="mt-3" id="changePasswordForm">
+            <div class="mb-4">
+                <label for="oldPwd" class="block text-sm font-medium text-gray-300 mb-2">Old Password</label>
+                <input type="password" id="oldPwd" name="oldPwd" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                <label for="newPwd" class="block text-sm font-medium text-gray-300 mb-2">New Password</label>
+                <input type="password" id="newPwd" name="newPwd" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                <label for="cfPwd" class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+                <input type="password" id="cfPwd" name="cfPwd" required
+                       class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+            </div>
+            <div id="changeErrorMessage" class="mb-4 text-red-500 text-sm hidden"></div>
+            <button type="button" id="changePasswordBtn" disabled
+                    class="w-full bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary-dark transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                Change Password
+            </button>
+        </form>
+    </div>
+</div>
+<header class="border-b border-gray-200 sticky top-0 bg-white z-10">
+    <div class="container mx-auto px-4 py-4 flex items-center">
+        <button id="mobileMenuToggle" class="mr-2 md:hidden text-primary hover:text-secondary focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+        <div class="flex-shrink-0 mr-2">
+            <a href="/" class="text-primary text-2xl font-bold">Kazilet</a>
+        </div>
+        <div class="relative flex-1">
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="searchInput" placeholder="Search course..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent">
+        </div>
+        <div class="flex items-center ml-2">
+            <button onclick="window.location.href='/gameplay/join'" class="text-gray-700 bg-gray-100 hover:text-gray-900 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium">
+                Join game
+            </button>
+            <button onclick="window.location.href='/authen/login'" class="login-btn text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                Login
+            </button>
+            <button onclick="window.location.href='/authen/register'" class="register-btn bg-secondary hover:bg-primary text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                Register
+            </button>
+            @* <span class="username text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-semibold" style="display: none;"></span> *@
+            <div class="relative username" id="username" style="display: none;">
+                <button id="usernameShow" class="text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-semibold"></button>
+                <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="showChangePasswordDialog()">Change Password</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="logout()">Logout</a>
+                </div>
+            </div>
+            @* <button onclick="logout()" class="logout-btn bg-secondary hover:bg-primary text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out" style="display: none;">
+            Logout
+            </button> *@
+        </div>
+    </div>
+</header>
+<body>
+    <div class="header">
+        <div>
+            <div class="title">Courses</div>
+        </div>
+        <div class="buttons">
+            <button class="btn" id="addCourseBtn"><i class="fas fa-plus"></i></button>
+        </div>
+    </div>
+
+    <div id="learningHistoryDialog" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDialog()">&times;</span>
+            <h2>Learning History</h2>
+            <div id="learningHistoryContent" class="flashcard-list">
+                <!-- Fetched data will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="flashcard-list" id="flashcardList"></div>
+
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePasswordModal()">&times;</span>
+            <h2>Enter Course Password</h2>
+            <input class="mt-2" type="password" id="passwordInput" placeholder="Enter password" />
+            <div class="mt-2">
+                <button class="rounded-lg px-4 py-2 text-white" id="submitPassword" style="background:#8854c0">Submit</button>
+
+            </div>
+            <p id="errorMessage" style="display:none;"></p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const flashcardList = document.getElementById('flashcardList');
+        let existingCourseIds = [];
+
+        // Hàm để tải và hiển thị danh sách các course trong folder
+        function loadCourses() {
+            const folderId = localStorage.getItem("folderId");
+            const apiUrl = `https://localhost:7024/api/Folders/GetCourse/${folderId}`;
+
+            $.ajax({
+                url: apiUrl,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    flashcardList.innerHTML = '';
+                    existingCourseIds = data.map(course => course.id);
+
+                    data.forEach(course => {
+                        const flashcardItem = document.createElement('div');
+                        flashcardItem.classList.add('flashcard-item');
+                        flashcardItem.onclick = () => checkCoursePublic(course.id);
+
+                        const flashcardIcon = document.createElement('div');
+                        flashcardIcon.classList.add('flashcard-icon');
+                        flashcardIcon.innerHTML = '<i class="fas fa-book-open"></i>';
+
+                        const flashcardInfo = document.createElement('div');
+                        flashcardInfo.classList.add('flashcard-info');
+
+                        const flashcardTitle = document.createElement('div');
+                        flashcardTitle.classList.add('flashcard-title');
+                        flashcardTitle.textContent = course.name;
+
+                        const flashcardDetails = document.createElement('div');
+                        flashcardDetails.classList.add('flashcard-details');
+                        flashcardDetails.textContent = `Course`;
+
+                        flashcardInfo.appendChild(flashcardTitle);
+                        flashcardInfo.appendChild(flashcardDetails);
+                        flashcardItem.appendChild(flashcardIcon);
+                        flashcardItem.appendChild(flashcardInfo);
+
+                        flashcardList.appendChild(flashcardItem);
+                    });
+                },
+                error: function (error) {
+                    console.error('Error fetching courses:', error);
+                }
+            });
+        }
+
+        // Tải danh sách courses khi trang tải
+        window.onload = loadCourses;
+
+        // Kiểm tra xem course có public không
+        function checkCoursePublic(courseId) {
+            $.ajax({
+                url: `https://localhost:7024/api/Courses/IsPublic/${courseId}`,
+                method: 'GET',
+                success: function (response) {
+                    if (response === "Course is public.") {
+                        window.location.href = `/Questions?courseId=${courseId}`;
+                    } else {
+                        openPasswordModal(courseId);
+                    }
+                },
+                error: function (error) {
+                    openPasswordModal(courseId);
+                    console.error('Error checking course public status:', error);
+                }
+            });
+        }
+
+        // Mở modal để nhập password
+        function openPasswordModal(courseId) {
+            document.getElementById('passwordModal').style.display = 'block';
+            document.getElementById('submitPassword').onclick = function () {
+                submitPassword(courseId);
+            };
+        }
+
+        // Đóng modal
+        function closePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+
+        // Submit password để vào khóa học
+        function submitPassword(courseId) {
+            const password = document.getElementById('passwordInput').value;
+            if (password) {
+                $.ajax({
+                    url: `https://localhost:7024/api/Courses/VerifyPassword/${courseId}?password=` + password,
+                    method: 'POST',
+                    body: "",
+                    success: function (response) {
+                        if (response === "Invalid password. Please try again.") {
+                            document.getElementById('errorMessage').style.display = 'block';
+                            document.getElementById('errorMessage').textContent = 'Incorrect password!';
+                        } else {
+                            window.location.href = `/Questions?courseId=${courseId}`;
+
+                            
+                        }
+                    },
+                    error: function (error) {
+                        console.error('Error submitting password:', error);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

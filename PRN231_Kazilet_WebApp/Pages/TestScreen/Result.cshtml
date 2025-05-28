@@ -1,0 +1,587 @@
+﻿@page
+@model PRN231_Kazilet_WebApp.Pages.TestScreen.ResultModel
+@{
+    ViewData["Title"] = "Test Results";
+    int correctAnswers = Model.Score;
+    int totalQuestions = Model.IncorrectAnswers.Count + correctAnswers;
+    int incorrectAnswers = Model.IncorrectAnswers.Count;
+    int unansweredQuestions = totalQuestions - incorrectAnswers - correctAnswers;
+    int correctPercentage = Model.Percentage;
+    int incorrectPercentage = 100 - correctPercentage;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Questions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #471b43;
+            margin: 0;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #33333350;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        }
+
+        .custom-checkbox {
+            display: none;
+        }
+
+        .custom-checkbox-label {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            border: 1px solid #33333350;
+            border-radius: 3px;
+            cursor: pointer;
+            background-color: #ffffff;
+            position: relative;
+        }
+
+        .custom-checkbox:checked + .custom-checkbox-label {
+            background-color: #8854c0;
+            border-color: #8854c0;
+        }
+
+            .custom-checkbox:checked + .custom-checkbox-label::after {
+                content: "✔";
+                color: #fff;
+                font-size: 16px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+        .nextButton {
+            background-color: #8854c0;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+            .nextButton:hover {
+                background-color: #60255b;
+            }
+
+        [type=checkbox]:focus + .custom-checkbox-label, [type=radio]:focus + .custom-checkbox-label {
+            box-shadow: none;
+            outline: none;
+        }
+
+        #timer {
+        }
+    </style>
+</head>
+<body>
+    <div id="changePasswordDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
+            <h3 class="text-2xl font-bold text-white mb-4">Change password</h3>
+            <form class="mt-3" id="changePasswordForm">
+                <div class="mb-4">
+                    <label for="oldPwd" class="block text-sm font-medium text-gray-300 mb-2">Old Password</label>
+                    <input type="password" id="oldPwd" name="oldPwd" required
+                           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                    <label for="newPwd" class="block text-sm font-medium text-gray-300 mb-2">New Password</label>
+                    <input type="password" id="newPwd" name="newPwd" required
+                           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                    <label for="cfPwd" class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+                    <input type="password" id="cfPwd" name="cfPwd" required
+                           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                </div>
+                <div id="changeErrorMessage" class="mb-4 text-red-500 text-sm hidden"></div>
+                <button type="button" id="changePasswordBtn" disabled
+                        class="w-full bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary-dark transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                    Change Password
+                </button>
+            </form>
+        </div>
+    </div>
+    <header class="border-b border-gray-200 sticky top-0 bg-white z-10">
+        <div class="container mx-auto px-4 py-4 flex items-center">
+            <button id="mobileMenuToggle" class="mr-2 md:hidden text-primary hover:text-secondary focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <div class="flex-shrink-0 mr-2">
+                <a href="/" class="text-primary text-2xl font-bold">Kazilet</a>
+            </div>
+            <div class="relative flex-1">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="searchInput" placeholder="Search course..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent">
+            </div>
+            <div class="flex items-center ml-2">
+                <button onclick="window.location.href='/gameplay/join'" class="text-gray-700 bg-gray-100 hover:text-gray-900 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium">
+                    Join game
+                </button>
+                <button onclick="window.location.href='/authen/login'" class="login-btn text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                    Login
+                </button>
+                <button onclick="window.location.href='/authen/register'" class="register-btn bg-secondary hover:bg-primary text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                    Register
+                </button>
+                @* <span class="username text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-semibold" style="display: none;"></span> *@
+                <div class="relative username" id="username" style="display: none;">
+                    <button id="usernameShow" class="text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-semibold"></button>
+                    <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="showChangePasswordDialog()">Change Password</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="logout()">Logout</a>
+                    </div>
+                </div>
+                @* <button onclick="logout()" class="logout-btn bg-secondary hover:bg-primary text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out" style="display: none;">
+                Logout
+                </button> *@
+            </div>
+        </div>
+    </header>
+    <div class="container" style="padding: 0 2%; margin: 0 auto">
+        <div style="padding: 20px; display: flex">
+            <div class="card" style="width:75%; margin-right:10px; height: min-content">
+                @if(Model.Percentage == 100)
+                {
+                    <div style="width:100%;text-align: center">
+                        <img style="width:40%; margin: 0 auto" src="../img/congrat.jpg" />
+                        <p style="font-size:50px">Congratulation!</p>
+                        <p style="font-size:20px">You have mastered the questions on the test</p>
+                    </div>
+                    
+                }
+                else
+                {
+                    <p style="font-size: 25px;margin-bottom:10px">Incorrect answers</p>
+                    <div>
+                        @if (Model.IncorrectAnswers.Any())
+                        {
+                            <ul>
+                                @foreach (var incorrectAnswer in Model.IncorrectAnswers)
+                                {
+                                    <li class="card">
+                                        <p>@incorrectAnswer.QuestionText</p>
+                                        @if (incorrectAnswer.AnswerDtos != null)
+                                        {
+                                            @foreach (var answer in incorrectAnswer.AnswerDtos)
+                                            {
+                                                @if (answer.IsCorrect == true)
+                                                {
+                                                    <p style="color:#6eff64">@answer.Content</p>
+                                                }
+                                                else
+                                                {
+                                                    @if (incorrectAnswer.UserAnswers != null)
+                                                    {
+                                                        bool flag = false;
+                                                        @foreach (var userSelectedAnswer in incorrectAnswer.UserAnswers)
+                                                        {
+                                                            @if (answer.Id == userSelectedAnswer)
+                                                            {
+                                                                flag = true;
+                                                                break;
+                                                            }
+                                                        }
+                                                        @if (flag == true)
+                                                        {
+                                                            <p style="color:#ff6060">@answer.Content</p>
+                                                        }
+                                                        else
+                                                        {
+                                                            <p>@answer.Content</p>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <p>@answer.Content</p>
+                                                    }
+
+                                                }
+                                            }
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                }
+                            
+            </div>
+
+            <div class="card" id="option-menu" style="position:sticky; top:20px; width: 25%; height: min-content">
+                <div>
+                    <div style="width: auto; height: auto;">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+                <div style="width: 100%;text-align:center">
+                    @if (Model.IncorrectAnswers.Count > 0)
+                    {
+                        <p style="margin-top: 10px;">You missed @Model.IncorrectAnswers.Count out of @Model.TotalQuestion questions</p>
+                    }              
+                </div>
+                
+                <button class="nextButton" onclick="window.location.href='/TestScreen/Test?isRetake=0';" type="button" style="margin-top:20px;width:100%">Retake</button>
+
+                <button class="nextButton" onclick="window.location.href='/Questions?courseId=@Model.Id';" type="button" style="margin-top:20px;width:100%">Back to Course</button>
+
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let newUrl = `/TestScreen/TestOptions?id=${@Model.Id}`;
+        history.replaceState(null, '', newUrl);
+
+        var ctx = document.getElementById('pieChart').getContext('2d');
+        var correctAnswers = @correctAnswers;
+        var incorrectAnswers = @incorrectAnswers;
+        var totalQuestions = @totalQuestions;
+
+        var percentageCorrect = Math.round((correctAnswers / totalQuestions) * 100);
+
+        var myPieChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [correctAnswers, incorrectAnswers],
+                    backgroundColor: ['#6eff64', '#ff6060'],
+                    borderColor: ['#6eff64', '#ff6060'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                cutoutPercentage: 80,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw + ' (' + Math.round(tooltipItem.raw / totalQuestions * 100) + '%)';
+                            }
+                        }
+                    },
+                    datalabels: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        Chart.register({
+            id: 'centerText',
+            beforeDraw: function (chart) {
+                var width = chart.width,
+                    height = chart.height,
+                    ctx = chart.ctx;
+
+                ctx.restore();
+                var fontSize = (height / 6).toFixed(2);
+                ctx.font = fontSize + "px sans-serif";
+                ctx.textBaseline = "middle";
+
+                var text = percentageCorrect + '%',
+                    textX = Math.round((width - ctx.measureText(text).width) / 2),
+                    textY = height / 1.9;
+
+                ctx.fillStyle = '#000';
+                ctx.fillText(text, textX, textY);
+                ctx.save();
+            }
+        });
+
+    </script>
+    <script>
+        function setCookie(name, value, seconds) {
+            const date = new Date();
+            date.setTime(date.getTime() + (seconds * 1000));
+            const expires = `expires=${date.toUTCString()}`;
+            document.cookie = `${name}=${value}; ${expires}; path=/`;
+        }
+
+        function getCookieV2(key) {
+            const value = document.cookie;
+
+            const cookies = value.split('; ').reduce((acc, cookie) => {
+                const [k, v] = cookie.split('=');
+                acc[k] = decodeURIComponent(v);
+                return acc;
+            }, {});
+
+            return cookies[key];
+        }
+
+        function deleteCookie(name) {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        }
+        function logout() {
+            deleteCookie("accessToken");
+            handleAuthUI();
+        }
+
+        // Function to check if the access token is valid
+        async function isAccessTokenValid() {
+            const token = getCookieV2('accessToken');
+            if (!token) return false;
+
+            try {
+                const response = await fetch('http://localhost:7024/api/Authentication/check', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error validating token');
+
+                const data = await response.json();
+
+                const usernameDisplay = document.getElementById('usernameShow');
+                const username = data.username;
+                usernameDisplay.innerHTML = 'Hello, ' + username;
+                return true;
+            } catch (error) {
+                console.error('Error making request:', error);
+                return false;
+            }
+        }
+
+        // Function to handle the authentication UI
+        async function handleAuthUI() {
+            const loginButton = document.querySelector('.login-btn');
+            const registerButton = document.querySelector('.register-btn');
+            const usernameDisplay = document.querySelector('.username');
+
+            const isValid = await isAccessTokenValid();
+
+            if (isValid) {
+                loginButton.style.display = 'none';
+                registerButton.style.display = 'none';
+                usernameDisplay.style.display = 'inline-block';
+            } else {
+                deleteCookie("accessToken");
+                loginButton.style.display = 'inline-block';
+                registerButton.style.display = 'inline-block';
+                usernameDisplay.style.display = 'none';
+            }
+        }
+
+        // Function to handle sidebar toggling
+        function updateSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.ml-0.md\\:ml-64');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const collapseSidebar = document.getElementById('collapseSidebar');
+            const menuText = document.getElementById('menuText');
+            const menuItemTexts = document.querySelectorAll('.menuItemText');
+
+            let isSidebarCollapsed = false;
+            let isSidebarOpen = window.innerWidth > 768;
+
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('-translate-x-full', !isSidebarOpen);
+                sidebar.classList.toggle('translate-x-0', isSidebarOpen);
+                mainContent.classList.remove('md:ml-64', 'md:ml-16');
+                mobileMenuToggle.classList.remove('hidden');
+                collapseSidebar.classList.add('hidden');
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                sidebar.classList.toggle('w-64', !isSidebarCollapsed);
+                sidebar.classList.toggle('w-16', isSidebarCollapsed);
+                mainContent.classList.toggle('md:ml-64', !isSidebarCollapsed);
+                mainContent.classList.toggle('md:ml-16', isSidebarCollapsed);
+                mobileMenuToggle.classList.add('hidden');
+                collapseSidebar.classList.toggle('hidden', isSidebarCollapsed);
+            }
+
+            menuText.classList.toggle('hidden', isSidebarCollapsed);
+            menuItemTexts.forEach(text => text.classList.toggle('hidden', isSidebarCollapsed));
+        }
+
+        // Debounced resize event listener to optimize performance
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(updateSidebar, 200);
+        });
+
+        // Function to toggle sidebar state
+        function toggleSidebarState() {
+            isSidebarOpen = !isSidebarOpen;
+            updateSidebar();
+        }
+
+        // Event listener for DOMContentLoaded to initialize UI
+        document.addEventListener('DOMContentLoaded', () => {
+            handleAuthUI();
+
+            const userMenu = document.getElementById('username');
+            const userMenuButton = document.getElementById('usernameShow');
+            const userDropdown = document.getElementById('userDropdown');
+            const changePasswordDialog = document.getElementById('changePasswordDialog');
+            const changePasswordBtn = document.getElementById('changePasswordBtn');
+            const changeErrorMessage = document.getElementById('changeErrorMessage');
+
+            const oldPwd = document.getElementById('oldPwd');
+            const newPwd = document.getElementById('newPwd');
+            const cfPwd = document.getElementById('cfPwd');
+
+            //User dropdown
+            userMenuButton.addEventListener('click', function () {
+                userDropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!userMenu.contains(event.target)) {
+                    userDropdown.classList.add('hidden');
+                }
+            });
+
+            //Change password handle
+            oldPwd.addEventListener('input', () => {
+                changePasswordBtn.disabled = (!oldPwd.value || !newPwd.value || !cfPwd.value);
+            });
+
+            newPwd.addEventListener('input', () => {
+                changePasswordBtn.disabled = (!oldPwd.value || !newPwd.value || !cfPwd.value);
+            });
+
+            cfPwd.addEventListener('input', () => {
+                changePasswordBtn.disabled = (!oldPwd.value || !newPwd.value || !cfPwd.value);
+            });
+
+            window.showChangePasswordDialog = function () {
+                changePasswordDialog.classList.remove('hidden');
+            };
+
+            changePasswordBtn.addEventListener('click', async function () {
+                const oldPassword = oldPwd.value;
+                const newPassword = newPwd.value;
+                const confirmPassword = cfPwd.value;
+
+                if (newPassword !== confirmPassword) {
+                    changeErrorMessage.textContent = 'New password and confirm password do not match.';
+                    changeErrorMessage.classList.remove('hidden');
+                    return;
+                }
+
+                const apiUrl = 'http://localhost:7024/api/Authentication/change';
+
+                try {
+                    const token = getCookieV2('accessToken');
+                    if (!token) {
+                        deleteCookie("accessToken");
+                        handleAuthUI();
+                    }
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(newPassword)
+                    });
+
+                    if (!response.ok) {
+                        changeErrorMessage.textContent = response.text;
+                        changeErrorMessage.classList.remove('hidden');
+                    } else {
+                        changeErrorMessage.textContent = '';
+                        changeErrorMessage.classList.add('hidden');
+                        changePasswordDialog.classList.add('hidden');
+                        alert("Change password successfully");
+                        deleteCookie("accessToken");
+                        window.location.href = '/authen/login';
+                    }
+                } catch (error) {
+                    changeErrorMessage.textContent = error;
+                    changeErrorMessage.classList.remove('hidden');
+                }
+            });
+
+            changePasswordDialog.addEventListener('click', function (event) {
+                if (event.target === changePasswordDialog) {
+                    changePasswordDialog.classList.add('hidden');
+                }
+            });
+
+            //Search input handle
+            const input = document.getElementById("searchInput");
+            input.addEventListener("keydown", function (event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    if (input.value != '') {
+                        window.location.href = '/courses?search=' + input.value;
+                    }
+                }
+            });
+
+            // Sidebar toggle event listeners
+            const sidebar = document.getElementById('sidebar');
+            const toggleSidebar = document.getElementById('toggleSidebar');
+            const collapseSidebar = document.getElementById('collapseSidebar');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const menuText = document.getElementById('menuText');
+            const menuItemTexts = document.querySelectorAll('.menuItemText');
+            const mainContent = document.querySelector('.ml-0.md\\:ml-64');
+
+            let isSidebarCollapsed = false;
+            let isSidebarOpen = window.innerWidth > 768;
+
+            function updateSidebar() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('-translate-x-full', !isSidebarOpen);
+                    sidebar.classList.toggle('translate-x-0', isSidebarOpen);
+                    mainContent.classList.remove('md:ml-64', 'md:ml-16');
+                    mobileMenuToggle.classList.remove('hidden');
+                    collapseSidebar.classList.add('hidden');
+                } else {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebar.classList.add('translate-x-0');
+                    sidebar.classList.toggle('w-64', !isSidebarCollapsed);
+                    sidebar.classList.toggle('w-16', isSidebarCollapsed);
+                    mainContent.classList.toggle('md:ml-64', !isSidebarCollapsed);
+                    mainContent.classList.toggle('md:ml-16', isSidebarCollapsed);
+                    mobileMenuToggle.classList.add('hidden');
+                    collapseSidebar.classList.toggle('hidden', isSidebarCollapsed);
+                }
+
+                menuText.classList.toggle('hidden', isSidebarCollapsed);
+                menuItemTexts.forEach(text => {
+                    text.classList.toggle('hidden', isSidebarCollapsed);
+                });
+            }
+
+            function toggleSidebarState() {
+                if (window.innerWidth <= 768) {
+                    isSidebarOpen = !isSidebarOpen;
+                } else {
+                    isSidebarCollapsed = !isSidebarCollapsed;
+                }
+                updateSidebar();
+            }
+
+            window.addEventListener('resize', updateSidebar);
+            updateSidebar();
+        });
+
+    </script>
+</body>
+</html>

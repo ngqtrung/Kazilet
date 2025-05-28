@@ -1,0 +1,542 @@
+﻿@page
+@model PRN231_Kazilet_WebApp.Pages.Courses.EditCourseModel
+@{
+}
+<style>
+    .custom-checkbox {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        border-radius: 3px;
+        border: 1px solid #33333350;
+    }
+
+        .custom-checkbox:checked {
+            background-color: #8854c0;
+        }
+
+    [type=checkbox]:focus, [type=radio]:focus {
+        box-shadow: none;
+        outline: none;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        color: #471b43;
+    }
+
+    .container {
+        max-width: 80%;
+        margin: 0 auto;
+    }
+
+    h1 {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+        color: #888;
+        margin-bottom: 20px;
+    }
+
+    .inputField {
+        width: 98%;
+        padding: 10px;
+        border: none;
+        border-bottom: 1px solid #33333350;
+        margin-bottom: 15px;
+        background-color: #ffffff;
+        color: #471b43;
+    }
+
+    .card {
+        background-color: #ffffff;
+        border: 1px solid #33333350;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 6px;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .card-number {
+        font-size: 14px;
+        color: #888;
+    }
+
+    .card-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .term, .definition {
+        flex: 1 1 45%;
+        min-width: 200px;
+    }
+
+    .language-select {
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 5px;
+        text-align: right;
+    }
+
+    .btn {
+        background-color: #8854c0;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 6px;
+    }
+
+        .btn:hover {
+            background-color: #60255b;
+        }
+
+    .add-card {
+        width: 70%;
+        margin-left: 15%;
+        margin-top: 20px;
+        padding: 15px;
+        font-size: 16px;
+    }
+
+    .add-definition {
+        background-color: #ffffff;
+        border: 1px dashed #333;
+        width: 100%;
+        margin-top: 10px;
+        color: #471b43;
+    }
+
+        .add-definition:hover {
+            background-color: #60255b1f;
+        }
+
+    .definition-container {
+        position: relative;
+        width: 98%;
+    }
+
+    .remove-definition {
+        position: absolute;
+        right: -25px;
+        top: 25%;
+        transform: translateY(-50%);
+        background-color: transparent;
+        color: #888;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        padding: 5px;
+    }
+
+        .remove-definition:hover {
+            color: #fff;
+        }
+</style>
+<header class="border-b border-gray-200 sticky top-0 bg-white z-10">
+    <div class="container mx-auto px-4 py-4 flex items-center">
+        <button id="mobileMenuToggle" class="mr-2 md:hidden text-primary hover:text-secondary focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+        <div class="flex-shrink-0 mr-2">
+            <a href="/" class="text-primary text-2xl font-bold">Kazilet</a>
+        </div>
+        <div class="relative flex-1">
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="searchInput" placeholder="Search course..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent">
+        </div>
+        <div class="flex items-center ml-2">
+            <button onclick="window.location.href='/gameplay/join'" class="text-gray-700 bg-gray-100 hover:text-gray-900 hover:bg-gray-200 px-3 py-2 rounded-md text-sm font-medium">
+                Join game
+            </button>
+            <button onclick="window.location.href='/authen/login'" class="login-btn text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
+                Login
+            </button>
+            <button onclick="window.location.href='/authen/register'" class="register-btn bg-secondary hover:bg-primary text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                Register
+            </button>
+            @* <span class="username text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-semibold" style="display: none;"></span> *@
+            <div class="relative username" id="username" style="display: none;">
+                <button id="usernameShow" class="text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-semibold"></button>
+                <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="showChangePasswordDialog()">Change Password</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="logout()">Logout</a>
+                </div>
+            </div>
+            @* <button onclick="logout()" class="logout-btn bg-secondary hover:bg-primary text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out" style="display: none;">
+            Logout
+            </button> *@
+        </div>
+    </div>
+</header>
+<body>
+    <div class="container" style="padding: 0 5%; margin-top: 1rem;">
+        <div style="display:flex; justify-content: space-between; margin-bottom: 20px">
+            <h1>Edit Course</h1>
+            <button class="btn" onclick="submitForm()">Save Changes</button>
+        </div>
+        <input type="text" id="title" class="inputField" placeholder="Enter a title" style="width: 100%">
+        <input type="text" id="courseId" class="inputField" style="display:none">
+        <textarea style="width:100%" id="description" class="inputField" placeholder="Add a description..."></textarea>
+        <div style="display: flex; justify-content:space-between" class="mb-4">
+            <div style="display: flex; align-items: center">
+                <div style="display: flex; align-items: center">
+                    <label for="publicCheckbox">Private Course</label>
+                    <input class="custom-checkbox mb-0 ml-2" type="checkbox" id="publicCheckbox" onchange="togglePasswordField()">
+                    <div id="passwordContainer" style="display: none; margin-left: 10px;">
+                        <input class="mb-0" type="password" id="password" placeholder="Enter password" style="width: 100%">
+                    </div>
+                </div>
+                
+
+            </div>
+            <div class="mb-2">
+                <button class="p-2 rounded-lg" style="background:#8854c0;border:1px solid #33333350;" id="importQuestionsBtn">
+                    <img style="filter: invert(100%) sepia(0%) saturate(7491%) hue-rotate(201deg) brightness(99%) contrast(106%)" class="w-8 h-8" src="~/images/import.png" />
+                </button>
+                <input type="file" id="fileInput" accept=".xlsx" style="display: none">
+                <button class="p-2 rounded-lg" style="background:#8854c0;border:1px solid #33333350;" id="exportQuestionsBtn">
+                    <img style="filter: invert(100%) sepia(0%) saturate(7491%) hue-rotate(201deg) brightness(99%) contrast(106%)" class="w-8 h-8" src="~/images/export.png" />
+                </button>
+            </div>
+        </div>
+        <div id="flashcards"></div>
+        <button class="btn add-card" onclick="addCard()">Add a question</button>
+    </div>
+</body>
+
+<script>
+    // Lấy dữ liệu khóa học từ localStorage (hoặc sessionStorage)
+    const courseData = JSON.parse(localStorage.getItem('courseData'));
+
+    if (courseData) {
+        document.getElementById('courseId').value = courseData.id;
+        console.log("Course: " + document.getElementById('courseId').value);
+        document.getElementById('title').value = courseData.name;
+        document.getElementById('description').value = courseData.description;
+        document.getElementById('publicCheckbox').checked = !courseData.isPublic;
+
+        // Hiển thị/ẩn trường mật khẩu dựa vào trạng thái khóa học
+        togglePasswordField();
+
+        // Thêm flashcards vào form
+        courseData.questions.forEach((question, index) => {
+            addCard(question.content, question.answers);
+        });
+    }
+
+
+
+    function validateForm(title, isPublic, password) {
+        if (!title) {
+            alert('Title cannot be empty!');
+            return false;
+        }
+
+        const terms = document.querySelectorAll('.question-content');
+        const definitions = document.querySelectorAll('.definition-container input[type="text"]');
+
+        for (let i = 0; i < terms.length; i++) {
+            if (!terms[i].value.trim()) {
+                alert(`Question ${i + 1} cannot be empty!`);
+                return false;
+            }
+        }
+
+        for (let i = 0; i < definitions.length; i++) {
+            if (!definitions[i].value.trim()) {
+                alert(`Answer for Question ${Math.floor(i / 4) + 1} cannot be empty!`);
+                return false;
+            }
+        }
+
+        // Nếu khóa học công khai mà không có mật khẩu, yêu cầu nhập mật khẩu
+        if (isPublic && !password) {
+            alert('Password cannot be empty for private courses!');
+            return false;
+        }
+
+        return true;
+    }
+
+    // Hàm import
+    document.getElementById('importQuestionsBtn').addEventListener('click', function () {
+        document.getElementById('fileInput').click();
+    });
+
+    document.getElementById('fileInput').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) {
+            return;
+        }
+
+        // Validate file extension
+        const fileExt = file.name.split('.').pop().toLowerCase();
+        if (fileExt !== 'xlsx') {
+            alert('Please select an Excel file (.xlsx)');
+            return;
+        }
+
+        const courseId = document.getElementById('courseId').value.trim();
+        if (!courseId) {
+            alert('Course ID is missing.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // Show loading indicator or disable button
+        const importBtn = document.getElementById('importQuestionsBtn');
+        const originalText = importBtn.textContent;
+        importBtn.textContent = 'Importing...';
+        importBtn.disabled = true;
+
+        // Sửa lại URL endpoint và thêm courseId vào query parameter
+        fetch(`https://localhost:7024/api/Courses/Import?courseId=${courseId}`, {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (response.ok) { // Kiểm tra response.ok thay vì status
+                    alert('Questions imported successfully!');
+                    window.location.href = "https://localhost:7081/Questions?courseId=" + courseId;
+                } else {
+                    throw new Error('Import failed with status: ' + response.status);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to import questions. Please try again.');
+            })
+            .finally(() => {
+                // Reset button state
+                importBtn.textContent = originalText;
+                importBtn.disabled = false;
+                // Reset file input
+                document.getElementById('fileInput').value = '';
+            });
+    });
+
+    // Hàm export
+    document.getElementById('exportQuestionsBtn').addEventListener('click', function () {
+        const courseId = document.getElementById('courseId').value.trim();
+        if (!courseId) {
+            alert('Course ID is missing.');
+            return;
+        }
+        const apiUrl = `https://localhost:7024/api/Courses/export?courseId=${courseId}`;
+        // Tạo một thẻ <a> ẩn và kích hoạt click để tải xuống file
+        const a = document.createElement('a');
+        a.href = apiUrl;
+        a.download = `Questions_${courseId}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
+
+
+    function validateForm(title, isPublic, password) {
+        if (!title) {
+            alert('Title cannot be empty!');
+            return false;
+        }
+
+        const terms = document.querySelectorAll('.question-content');
+        const definitions = document.querySelectorAll('.definition-container input[type="text"]');
+
+        for (let i = 0; i < terms.length; i++) {
+            if (!terms[i].value.trim()) {
+                alert(`Question ${i + 1} cannot be empty!`);
+                return false;
+            }
+        }
+
+        for (let i = 0; i < definitions.length; i++) {
+            if (!definitions[i].value.trim()) {
+                alert(`Answer for Question ${Math.floor(i / 4) + 1} cannot be empty!`);
+                return false;
+            }
+        }
+
+        // Nếu khóa học công khai mà không có mật khẩu, yêu cầu nhập mật khẩu
+        if (isPublic && !password) {
+            alert('Password cannot be empty for private courses!');
+            return false;
+        }
+
+        return true;
+    }
+
+    function addCard(questionContent = '', answers = []) {
+        const flashcardsContainer = document.getElementById('flashcards');
+        const cardCount = flashcardsContainer.children.length + 1;
+        const newCard = document.createElement('div');
+        newCard.className = 'card';
+        newCard.innerHTML = `
+                <div class="card-header">
+                    <span class="card-number">${cardCount}</span>
+                    <div>
+                        <button class="btn" onclick="removeCard(this)">×</button>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="term">
+                        <input type="text" value="${questionContent}" class="inputField question-content">
+                    </div>
+                    <div class="definition">
+                        ${answers.map(answer => `
+                            <div class="definition-container" style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" class="custom-checkbox" style="margin-right: 5px; border: 1px solid #33333350; margin-top: 4px;" ${answer.isCorrect ? 'checked' : ''}>
+                                <input type="text" value="${answer.content}" class="inputField">
+                                <button class="btn remove-definition" onclick="removeDefinition(this)">×</button>
+                            </div>
+                        `).join('')}
+                        <button class="btn add-definition" onclick="addDefinition(this)">+ Add another answer</button>
+                    </div>
+                </div>
+            `;
+        flashcardsContainer.appendChild(newCard);
+    }
+
+    // Hàm thêm một answer mới
+    function addDefinition(button) {
+        const definitionContainer = button.parentElement;
+        const newDefinition = document.createElement('div');
+        newDefinition.className = 'definition-container';
+        newDefinition.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" class="custom-checkbox" style="margin-right: 5px; border: 1px solid #33333350; margin-top: 4px;">
+                    <input type="text" placeholder="Enter answer" class="inputField">
+                    <button class="btn remove-definition" onclick="removeDefinition(this)">×</button>
+                </div>
+            `;
+        definitionContainer.insertBefore(newDefinition, button);
+    }
+
+
+    // Hàm xoá một answer
+    function removeDefinition(button) {
+        button.closest('.definition-container').remove();
+    }
+
+    // Hàm xoá một flashcard
+    function removeCard(button) {
+        button.closest('.card').remove();
+    }
+
+    // Hàm submit form và gửi dữ liệu
+    function submitForm() {
+        const courseId = document.getElementById('courseId').value.trim();
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const isPublic = document.getElementById('publicCheckbox').checked;
+        const password = isPublic ? document.getElementById('password').value.trim() : null;
+
+
+        if (!validateForm(title, isPublic, password)) {
+            return; // Dừng nếu có lỗi validation
+        }
+
+        // Xử lý lưu thay đổi khóa học vào API
+        const questions = [];
+        const terms = document.querySelectorAll('.question-content');
+        const allDefinitions = document.querySelectorAll('.definition');
+
+        terms.forEach((term, i) => {
+            const questionContent = term.value.trim();
+            const answers = [];
+            const definitions = allDefinitions[i].querySelectorAll('.definition-container input[type="text"]');
+            const checkboxes = allDefinitions[i].querySelectorAll('.definition-container input[type="checkbox"]');
+
+            definitions.forEach((definition, j) => {
+                const definitionContent = definition.value.trim();
+                const isCorrect = checkboxes[j].checked;
+                if (definitionContent) {
+                    answers.push({
+                        content: definitionContent,
+                        isCorrect: isCorrect
+                    });
+                }
+            });
+
+            questions.push({
+                content: questionContent,
+                answers: answers
+            });
+        });
+
+        const updatedCourseData = {
+            id: courseId,
+            name: title,
+            description: description,
+            coursePassword: password,
+            isPublic: !isPublic,
+            questions: questions,
+            folders: [],
+            gameplaySettings: [],
+            learningHistories: []
+        };
+
+        // Gửi API để cập nhật dữ liệu khóa học
+        fetch('https://localhost:7024/api/Courses/Update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedCourseData),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Course updated successfully!');
+                } else {
+                    alert('Failed to update course!');
+                }
+            })
+            .catch(error => {
+                const apiUrl = `https://localhost:7024/odata/Question/${courseId}`;
+
+                $.ajax({
+                    url: apiUrl,
+                    method: 'GET',
+                    success: function () {
+                        window.location.href = `/Questions?courseId=${courseId}`;
+                    },
+                    error: function (error) {
+                        console.error('Error fetching course details:', error);
+                    }
+                });
+            });
+    }
+
+    function togglePasswordField() {
+        const passwordContainer = document.getElementById('passwordContainer');
+        const publicCheckbox = document.getElementById('publicCheckbox');
+        if (publicCheckbox.checked) {
+            document.getElementById('password').value = courseData.coursePassword;
+            passwordContainer.style.display = 'block';
+        } else {
+            passwordContainer.style.display = 'none';
+        }
+    }
+
+</script>

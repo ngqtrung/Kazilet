@@ -1,0 +1,188 @@
+﻿@page
+@model PRN231_Kazilet_WebApp.Pages.Test.TestModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Questions</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.0/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.0/dist/sweetalert2.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #471b43;
+            margin: 0;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #33333350;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        }
+
+        .custom-checkbox {
+            display: none;
+        }
+
+        .custom-checkbox-label {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            border: 1px solid #33333350;
+            border-radius: 3px;
+            cursor: pointer;
+            background-color: #ffffff;
+            position: relative;
+        }
+
+        .custom-checkbox:checked + .custom-checkbox-label {
+            background-color: #8854c0;
+            border-color: #8854c0;
+        }
+
+            .custom-checkbox:checked + .custom-checkbox-label::after {
+                content: "✔";
+                color: #fff;
+                font-size: 16px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+        .nextButton {
+            background-color: #8854c0;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+            .nextButton:hover {
+                background-color: #60255b;
+            }
+
+        [type=checkbox]:focus + .custom-checkbox-label, [type=radio]:focus + .custom-checkbox-label {
+            box-shadow: none;
+            outline: none;
+        }
+
+        #timer {
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" style="padding: 0 2%; margin: 0 auto">
+        <div style="padding: 20px; display: flex">
+            <div class="card" style="width:75%; margin-right:10px; height: min-content">
+                @{
+                    Model.IsRetake = 0;
+                }
+                <form id="questionForm" method="post" asp-page-handler="Submit">
+                    <input style="display:none" type="number" value="0" name="isRetake" />
+                    @for (int i = 0; i < Model.QuestionList.Count; i++)
+                    {
+                        var question = Model.QuestionList[i];
+                        <div id="question-display">
+                            <p style="margin-bottom: 5px"><strong>Question @(i + 1):</strong> @question.Content</p>
+                            @foreach (var answer in question.Answers)
+                            {
+                                <div style="display:flex; margin-left:10px; margin-bottom: 5px">
+                                    <input id="checkbox-@answer.Id" class="custom-checkbox" type="checkbox" name="question-@question.Id" value="@answer.Id" data-question-id="@question.Id" />
+                                    <label for="checkbox-@answer.Id" class="custom-checkbox-label"></label>
+                                    <p style="margin: auto 0 auto 10px">@answer.Content</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                </form>
+            </div>
+
+            <div class="card" style="position:sticky; top:20px; width: 25%; height: min-content">
+                <div>
+                    <p style="margin-bottom: 0"><strong>Selected: </strong><span id="selected-count">0</span> of @Model.QuestionList.Count questions</p>
+                    <div style="display:flex"><p style="margin-right:5px"><strong>Time left: </strong></p><p id="timer">00:00</p></div>
+                </div>
+
+                <button id="submitBtn" class="nextButton" onclick="submitForm()" type="button" style="margin-top:20px;width:100%">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let url = new URL(window.location.href);
+        url.searchParams.set('isRetake', 0);
+        history.replaceState(null, '', url.toString());
+
+        let timeLeft = @Model.Duration * 60;
+        let form = document.getElementById('questionForm');
+        let countdown = setInterval(function () {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            if (seconds < 10) {
+                seconds = "0" + seconds;
+            }
+
+            document.getElementById('timer').textContent = ` ${minutes}:${seconds}`;
+            if (timeLeft <= 60) {
+                document.getElementById('timer').style.color = 'red';
+            }
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                submitForm();
+            }
+
+            timeLeft--;
+        }, 1000);
+
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+        function updateSelectedCount() {
+            let selectedQuestions = new Set();
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    const questionId = checkbox.getAttribute('data-question-id');
+                    selectedQuestions.add(questionId);
+                }
+            });
+            document.getElementById('selected-count').textContent = selectedQuestions.size;
+        }
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedCount);
+        });
+
+        function submitForm() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to submit your answers?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, submit!',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit(); // Submit the form
+                } else {
+                    Swal.fire(
+                        'Cancelled',
+                        'Your submission was not submitted.',
+                        'error'
+                    );
+                }
+            });
+        }
+    </script>
+</body>
+</html>
